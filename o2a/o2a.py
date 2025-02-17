@@ -142,6 +142,7 @@ def parse_args(args):
         help="The user to be used in place of all " "${user.name} [defaults to user who ran the conversion]",
     )
     parser.add_argument("-s", "--start-days-ago", help="Desired DAG start as number of days ago", default=0)
+    parser.add_argument("-x", "--schema-version", help="Desired Oozie all schema version.[1.0,0.4]", default="1.0")
     parser.add_argument(
         "-v", "--schedule-interval", help="Desired DAG schedule interval as number of days", default=0
     )

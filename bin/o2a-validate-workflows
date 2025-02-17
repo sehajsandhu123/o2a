@@ -30,13 +30,14 @@ if [[ "${VERBOSE}" != "" ]]; then
     XMLLINT_EXTRA_PARAMS="--load-trace"
 fi
 
-for WORKFLOW in "$@"; do
+for WORKFLOW in "$1"; do
     echo
     echo "Validating ${WORKFLOW}"
     echo
     set +e
     # Note - if you add new actions add the schema for this action to "all-schemas-1.0.xsd"
-    xmllint --noout ${XMLLINT_EXTRA_PARAMS} --schema "${SCHEMA_DIR}/all-schemas-1.0.xsd" "${WORKFLOW}"
+    xmllint --noout ${XMLLINT_EXTRA_PARAMS} --schema "${SCHEMA_DIR}/${2}/all-schemas-${2}.xsd" "${WORKFLOW}"
+    #xmllint --noout ${XMLLINT_EXTRA_PARAMS} --schema "${SCHEMA_DIR}/all-schemas-1.0.xsd" "${WORKFLOW}"
     ERR=$?
     set -e
     if [[ ${ERR} != "0" ]]; then
