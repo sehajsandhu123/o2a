@@ -108,11 +108,15 @@ def _resolve_name_node(translation: str, props: PropertySet) -> Tuple[Optional[s
     Check if props include nameNode, nameNode1 or nameNode2 value.
     """
     merged = props.merged
-    for key in ["nameNode", "nameNode1", "nameNode2"]:
+    for key in ["nameNode", "nameNode1", "nameNode2", "dataNode", "tmpLocation"]:
+    #Add the variables that resolve to an hdfs location "${tmpLocation}"
         start_str = "{{" + key + "}}"
+        start_str_data_node = "${" + "dataNode" + "}"
         name_node = merged.get(key)
         if translation.startswith(start_str) and name_node:
             return name_node, len(start_str)
+        if translation.startswith(start_str_data_node) and name_node:
+            return name_node, len(start_str_data_node)
     return None, 0
 
 
@@ -132,7 +136,8 @@ def normalize_path(url: str, props: PropertySet, allow_no_schema=False, translat
     name_node, shift = _resolve_name_node(url_with_var, props)
     if name_node:
         url_parts = urlparse(name_node)
-        output = url_with_var[shift:]
+        output = url_with_var #[shift:] commented out shift as alot of additonal variables like hdfs file location can be added in _resolve_name_node 
+
     else:
         url_parts = urlparse(url_with_var)
         output = url_parts.path
@@ -141,7 +146,7 @@ def normalize_path(url: str, props: PropertySet, allow_no_schema=False, translat
     if url_parts.scheme not in allowed_schemas:
         raise ParseException(
             f"Unknown path format. The URL should be provided in the following format: "
-            f"hdfs://localhost:9200/path. Current value: {url_with_var}"
+            f"hdfs://localhost:9200/path. Current value: {url_with_var} {name_node} {shift} {output}"
         )
 
     return output
@@ -168,7 +173,7 @@ def replace_url_el(url: str, props: PropertySet, allow_no_schema=False) -> str:
     if url_parts.scheme not in allowed_schemas:
         raise ParseException(
             f"Unknown path format. The URL should be provided in the following format: "
-            f"hdfs://localhost:9200/path. Current value: {url_with_var}"
+            f"hdfs://localhost:9200/path. Current value: {url_with_var} {name_node}"
         )
 
     return url_with_var
