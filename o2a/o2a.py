@@ -59,7 +59,11 @@ def main():
     args = parse_args(sys.argv[1:])
     input_directory_path = args.input_directory_path
     output_directory_path = args.output_directory_path
+    schema_version = args.schema_version
+    if not schema_version:
+        schema_version = "1.0"
 
+    print("Oozie XML schema_version - > ", schema_version)
     start_days_ago = args.start_days_ago
     schedule_interval = args.schedule_interval
     dag_name = args.dag_name
@@ -83,15 +87,19 @@ Otherwise please provide it.
 ########################################################################################
         """
         )
-    validate_workflows_script = get_o2a_validate_workflows_script()
-    if validate_workflows_script:
-        try:
-            check_call([validate_workflows_script, f"{input_directory_path}/{HDFS_FOLDER}/{WORKFLOW_XML}"])
-        except CalledProcessError:
-            logging.error(
-                "Workflow failed schema validation. " "Please correct the workflow XML and try again."
-            )
-            exit(1)
+    if args.skip_validation == "false":
+        validate_workflows_script = get_o2a_validate_workflows_script()
+        if validate_workflows_script:
+            try:
+                check_call([validate_workflows_script, f"{input_directory_path}/{HDFS_FOLDER}/{WORKFLOW_XML}", schema_version])
+            except CalledProcessError:
+                logging.error(
+                    "Workflow failed schema validation. " "Please correct the workflow XML and try again."
+                )
+                exit(1)
+    else:
+        print("Skipping validation as per user request")
+
     os.makedirs(output_directory_path, exist_ok=True)
 
     if args.dot:
@@ -143,6 +151,7 @@ def parse_args(args):
     )
     parser.add_argument("-s", "--start-days-ago", help="Desired DAG start as number of days ago", default=0)
     parser.add_argument("-x", "--schema-version", help="Desired Oozie all schema version.[1.0,0.4]", default="1.0")
+    parser.add_argument("-skv", "--skip-validation", help="skip validation", default="false")
     parser.add_argument(
         "-v", "--schedule-interval", help="Desired DAG schedule interval as number of days", default=0
     )
