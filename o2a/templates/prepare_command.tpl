@@ -12,12 +12,13 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+  #"$DAGS_FOLDER/../data/prepare.sh "
+
 #}
-"$DAGS_FOLDER/../data/prepare.sh "
-"-c %s -r %s "
-{% if delete is not none %}'-d %s '{% endif %}
-{% if mkdir is not none %}'-m %s '{% endif %}
-% (CONFIG['dataproc_cluster'], CONFIG['gcp_region'],
+"hdfs dfs "
+{% if delete is not none %}'-rm -f -r %s '{% endif %}
+{% if mkdir is not none %}'-mkdir -p %s '{% endif %}
+% (
  {% if delete is not none %}shlex.quote({{ delete | to_python }}),{% endif %}
  {% if mkdir is not none %}shlex.quote({{ mkdir | to_python }}),{% endif %}
 )

@@ -17,7 +17,6 @@
 {{ task_id | to_var }} = bash.BashOperator(
     task_id={{ task_id | to_python }},
     trigger_rule={{ trigger_rule | to_python }},
-    bash_command={% include "pig_command.tpl" %} % (CONFIG['dataproc_cluster'], CONFIG['gcp_region'],
-        shlex.quote({{ pig_command | to_python }})),
+    bash_command=({{ pig_command | to_python }}),
     params={{ props_macro.props(action_node_properties=action_node_properties) }},
 )

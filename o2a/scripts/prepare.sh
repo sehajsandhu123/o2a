@@ -40,10 +40,10 @@ shift "$((OPTIND -1))"
 
 for DEL_DIR in "${DEL_DIRS[@]}"; do
     # Gcloud expects the path not to contain any apostrophes or quotation marks, hence just the ${DEL_DIR}.
-    gcloud dataproc jobs submit pig --cluster="${CLUSTER}" --region="${REGION}" --execute "fs -rm -f -r ${DEL_DIR}"
+    "hdfs dfs -rm -f -r ${DEL_DIR}"
 done
 
 for MK_DIR in "${MK_DIRS[@]}"; do
     # Gcloud expects the path not to contain any apostrophes or quotation marks, hence just the ${DEL_DIR}.
-    gcloud dataproc jobs submit pig --cluster="${CLUSTER}" --region="${REGION}" --execute "fs -mkdir -p ${MK_DIR}"
+    "hdfs dfs -mkdir -p ${MK_DIR}"
 done
