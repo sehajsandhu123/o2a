@@ -36,28 +36,22 @@ def extract_properties_from_configuration_node(config_node: ET.Element) -> Dict[
         name_node = property_node.find(TAG_NAME)
         value_node = property_node.find(TAG_VALUE)
 
+        # Check if name_node and value_node exist
         if name_node is None or value_node is None:
-            raise ParseException(
-                'Element "property" should have direct children elements: name, value. One of them does not '
-                "exist. Make sure the configuration element is valid."
-            )
+            print('Element "property" should have direct children elements: name, value. One of them does not exist. Skipping this property.')
+            continue  # Skip this property if either name or value is missing
 
         name = name_node.text
         value = value_node.text
 
-        if not name:
-            raise ParseException(
-                'Element "name" should have content, however its value is empty. Make sure the element has '
-                "the correct content."
-            )
+        # Print debug information
+        print(f"name_node: {name}, value_node: {value}")
 
-        if not value:
-            raise ParseException(
-                'Element "value" should have content, however its value is empty. Make sure the element has '
-                "the correct content."
-            )
-
-        properties_dict[name] = el_parser.translate(value)
+        # Only add to properties_dict if name and value are not None or empty
+        if name and value:
+            properties_dict[name] = el_parser.translate(value)
+        else:
+            print(f"Skipping property with name: {name} and value: {value} because one of them is empty.")
 
     return properties_dict
 
@@ -68,13 +62,18 @@ def extract_properties_from_job_xml_nodes(job_xml_nodes: List[ET.Element], input
 
     for xml_file in job_xml_nodes:
         file_name = xml_file.text
+        print(f"file_name: {file_name}")
         if not file_name:
             raise ParseException(
                 'Element "job-xml" should have content, however its value is empty. Make sure the element '
                 "has the correct content."
             )
-        file_path = path.join(input_directory_path, HDFS_FOLDER, file_name)
+        file_path = path.join(file_name)
+        print(f"file_path: {file_path}")
         config_tree = ET.parse(file_path)
+        print(f"config_tree: {config_tree}")
+        print(f"config_tree XML content:\n{ET.tostring(config_tree.getroot(), encoding='unicode')}")
+
         config_node = config_tree.getroot()
         if not config_node:
             raise ParseException(
