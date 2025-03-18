@@ -17,6 +17,17 @@
 {{ task_id | to_var }} = bash.BashOperator(
     task_id={{ task_id | to_python }},
     trigger_rule={{ trigger_rule | to_python }},
-    bash_command=({{ pig_command | to_python }}),
+    bash_command="""
+    {%- if hdfs_files %}
+    # Copy files from HDFS to local working directory
+    {% for file in hdfs_files %}
+    hdfs dfs -get {{ file.source }} {{ file.target }} || exit 1
+    chmod +x {{ file.target }} || echo "Warning: Could not make {{ file.target }} executable"
+    {% endfor %}
+    {% endif %}
+    
+    # Execute the shell command
+    {{ pig_command }}
+    """,
     params={{ props_macro.props(action_node_properties=action_node_properties) }},
 )

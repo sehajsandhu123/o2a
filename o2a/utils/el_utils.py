@@ -110,8 +110,8 @@ def _resolve_name_node(translation: str, props: PropertySet) -> Tuple[Optional[s
     merged = props.merged
     for key in ["nameNode", "nameNode1", "nameNode2", "dataNode", "tmpLocation"]:
     #Add the variables that resolve to an hdfs location "${tmpLocation}"
-        start_str = "{{" + key + "}}"
-        start_str_data_node = "${" + "dataNode" + "}"
+        start_str = "{{" + ' params.get(\'' + key + '\') ' + "}}"
+        start_str_data_node = "${" + ' params.get(\'' + "dataNode" + '\') ' + "}"
         name_node = merged.get(key)
         if translation.startswith(start_str) and name_node:
             return name_node, len(start_str)

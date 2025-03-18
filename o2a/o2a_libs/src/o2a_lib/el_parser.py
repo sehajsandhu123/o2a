@@ -222,11 +222,34 @@ def _translate_token(token: Token) -> str:
         else:
             token.value = False
 
-    if token.type == "FIRST_JAVA":
+    if token.type == "FIRST_JAVA" or token.type == "JAVA":
         if token.value in EL_CONSTANTS.keys():
             return str(EL_CONSTANTS[token.value])
+        # Check if this is a variable and not part of a function call
+        if not _is_part_of_function(token):
+            return f" params.get('{token.value}') "
 
     return str(token.value)
+
+
+def _is_part_of_function(token: Token) -> bool:
+    """
+    Check if the token is part of a function call.
+    """
+    # Get parent and position in parent
+    parent = getattr(token, 'parent', None)
+    if not parent:
+        return False
+    
+    # Check if parent is a function_invocation
+    if hasattr(parent, 'data') and parent.data == 'function_invocation':
+        return True
+    
+    # Check if this is inside a value_suffix (like .property or ['property'])
+    if hasattr(parent, 'data') and parent.data == 'value_suffix':
+        return True
+    
+    return False
 
 
 def _translate_tail(tree: Tree, f_mod: str = "") -> str:
@@ -282,6 +305,20 @@ def _translate_el(tree: Union[Tree, Token], functions_module: str = "") -> str:
     """
     Translates el expression to jinja equivalent.
     """
+    # Handle variable identifiers (lvalue_inner with a single identifier child)
+    if isinstance(tree, Tree) and tree.data == "lvalue_inner" and len(tree.children) == 1:
+        if isinstance(tree.children[0], Token) and tree.children[0].type in ("JAVA", "FIRST_JAVA"):
+            var_name = tree.children[0].value
+            if var_name in EL_CONSTANTS:
+                return str(EL_CONSTANTS[var_name])
+            return f" params.get('{var_name}') "
+    
+    # Handle identifiers in first position that are not part of function calls
+    if isinstance(tree, Tree) and tree.data == "first_identifier":
+        var_name = tree.children[0].value
+        if var_name in EL_CONSTANTS:
+            return str(EL_CONSTANTS[var_name])
+        return f" params.get('{var_name}') "
 
     if isinstance(tree, Token):
         return _translate_token(tree)
@@ -339,7 +376,34 @@ def translate(expression: str, functions_module: str = "functions", quote: bool 
         translation = translation.replace(" {{", "{{")
     elif " {{" not in translation:
         translation = translation.replace("{{", " {{")
+    
+    # Post-processing to replace simple variables with params.get()
+    translation = _convert_variables_to_params_get(translation)
 
     if quote:
         return "'" + translation + "'"
     return translation
+def _convert_variables_to_params_get(translation: str) -> str:
+    """
+    Convert simple variable references like {{variable}} to {{params.get('variable')}}
+    Skips function calls and complex expressions.
+    """
+    # This regex finds variable patterns inside {{ }} that don't have dots, parens, etc.
+    pattern = r'{{([a-zA-Z_][a-zA-Z0-9_\.]*)(?!\(|}})([^}]*)}}'
+    
+    def replace_match(match):
+        # Check if this appears to be a function call or complex expression
+        var_name = match.group(1)
+        suffix = match.group(2)
+        print(suffix)
+        print(var_name)
+        print(match.group(0))
+        # If this might be a function call or has complex expressions, don't modify it
+        if '(' in suffix or ')' in suffix or '+' in suffix or '-' in suffix or '*' in suffix or '/' in suffix:
+            return match.group(0)
+        print('volia' + f"{{{{ params.get('{var_name}{suffix}') }}}}")
+        # If it's a simple variable, wrap it with params.get()
+        return f"{{{{ params.get('{var_name}{suffix}') }}}}"
+    
+    return re.sub(pattern, replace_match, translation)
+

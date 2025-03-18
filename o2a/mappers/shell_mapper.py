@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Maps Shell action into Airflow's DAG"""
-from typing import List, Set
+from typing import List, Set, Dict
 from xml.etree.ElementTree import Element
 
 
@@ -22,14 +22,16 @@ from o2a.converter.relation import Relation
 from o2a.mappers.action_mapper import ActionMapper
 from o2a.mappers.extensions.prepare_mapper_extension import PrepareMapperExtension
 from o2a.o2a_libs.src.o2a_lib.property_utils import PropertySet
-from o2a.utils.xml_utils import get_tag_el_text, get_tags_el_array_from_text
+from o2a.utils.xml_utils import get_tag_el_text, get_tags_el_array_from_text, find_nodes_by_tag
 from o2a.o2a_libs.src.o2a_lib import el_parser
+from o2a.utils.el_utils import normalize_path
 
 
 TAG_RESOURCE = "resource-manager"
 TAG_NAME = "name-node"
 TAG_CMD = "exec"
 TAG_ARG = "argument"
+TAG_FILE = "file"
 
 
 class ShellMapper(ActionMapper):
@@ -48,17 +50,67 @@ class ShellMapper(ActionMapper):
 
         cmd_txt = get_tag_el_text(self.oozie_node, TAG_CMD)
         args = get_tags_el_array_from_text(self.oozie_node, TAG_ARG)
-        cmd = " ".join([cmd_txt] + [x for x in args])
+        
+        # Format each argument with proper spacing
+        formatted_args = []
+        for arg in args:
+            formatted_args.append(f" {arg} ")
+        
+        # Join the command with the formatted arguments
+        cmd = cmd_txt + "".join(formatted_args)
 
         self.bash_command = el_parser.translate(cmd, quote=False)
         self.pig_command = f"sh {self.bash_command}"
+        
+        # Parse file nodes
+        self.hdfs_files = self._parse_file_nodes()
+
+    def _parse_file_nodes(self) -> List[Dict[str, str]]:
+        """
+        Parse the <file> nodes which specify HDFS files to be copied to the local working directory.
+        
+        In Oozie, the file elements can include an optional local name fragment after the # character.
+        For example:
+            <file>hdfs://path/to/file.sh</file> - copies the file with original name
+            <file>hdfs://path/to/file.sh#renamed.sh</file> - copies and renames to renamed.sh
+        
+        Returns:
+            List of dictionaries with 'source' and 'target' keys
+        """
+        files = []
+        file_nodes = find_nodes_by_tag(self.oozie_node, TAG_FILE)
+        
+        for file_node in file_nodes:
+            file_path = file_node.text
+            if not file_path:
+                continue
+                
+            # Normalize the path to handle variable substitution
+            file_path = normalize_path(file_path, props=self.props, allow_no_schema=True)
+            
+            # Check if there's a target filename specified with #
+            if '#' in file_path:
+                source_path, target_name = file_path.split('#', 1)
+            else:
+                source_path = file_path
+                # Extract just the filename from the path
+                target_name = source_path.split('/')[-1]
+                
+            files.append({
+                'source': source_path,
+                'target': target_name
+            })
+            
+        return files
 
     def to_tasks_and_relations(self):
         action_task = Task(
             task_id=self.name,
             template_name="shell.tpl",
             template_params=dict(
-                pig_command=self.pig_command, action_node_properties=self.props.action_node_properties
+                pig_command=self.pig_command,
+                action_node_properties=self.props.action_node_properties,
+                hdfs_files=self.hdfs_files
             ),
         )
         tasks = [action_task]
@@ -71,5 +123,7 @@ class ShellMapper(ActionMapper):
     def required_imports(self) -> Set[str]:
         return {
             "from airflow.utils import dates",
-            "from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator"
+            "from airflow.providers.google.cloud.operators.dataproc import DataprocSubmitJobOperator",
+            "import os",  # Added for file path handling
+            "from airflow.operators.bash import BashOperator"  # Ensures BashOperator is available
         }
