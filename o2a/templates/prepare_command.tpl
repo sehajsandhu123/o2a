@@ -15,10 +15,11 @@
   #"$DAGS_FOLDER/../data/prepare.sh "
 
 #}
-"hdfs dfs "
-{% if delete is not none %}'-rm -f -r %s '{% endif %}
-{% if mkdir is not none %}'-mkdir -p %s '{% endif %}
-% (
- {% if delete is not none %}shlex.quote({{ delete | to_python }}),{% endif %}
- {% if mkdir is not none %}shlex.quote({{ mkdir | to_python }}),{% endif %}
-)
+"""
+{% if delete is not none %}
+hdfs dfs -rm -f -r {{ delete | to_python}}
+{% endif %}
+{% if mkdir is not none %}
+hdfs dfs -mkdir -p {{ mkdir | to_python }}
+{% endif %}
+"""
