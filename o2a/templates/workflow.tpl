@@ -23,6 +23,8 @@ CONFIG={{ config | to_python }}
 
 JOB_PROPS={{ job_properties | to_python }}
 
+JOB_PROPS = functions.resolve_variables(JOB_PROPS)
+
 TASK_MAP={{ task_map | to_python }}
 
 TEMPLATE_ENV = {**CONFIG, **JOB_PROPS, "functions": functions, "task_map": TASK_MAP }

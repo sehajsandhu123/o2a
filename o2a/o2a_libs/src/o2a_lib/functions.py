@@ -147,6 +147,24 @@ def trim(src_str: str) -> str:
     return str(src_str) + ".strip()" if src_str else ""
 
 
+def resolve_variables(config_dict):
+    """
+    Resolves nested variable references in a dictionary.
+    Converts ${var} syntax to values from the same dictionary.
+    """
+    import re
+
+    resolved = config_dict.copy()
+    for key, value in config_dict.items():
+        if isinstance(value, str):
+            value = re.sub(r"\$\{(\w+)\}", r"{\1}", value)  # Fix ${var} syntax
+            try:
+                resolved[key] = value.format(**resolved)  # Replace with actual values
+            except KeyError:
+                # Keep original if variables can't be resolved
+                pass
+    return resolved
+
 FUNCTION_MAP = {
     "wf_id": "run_id",
     "wf_name": "dag.dag_id",
