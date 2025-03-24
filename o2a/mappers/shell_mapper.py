@@ -110,6 +110,7 @@ class ShellMapper(ActionMapper):
             template_params=dict(
                 pig_command=self.pig_command,
                 action_node_properties=self.props.action_node_properties,
+                action_node_path=self.props.action_node_path,
                 hdfs_files=self.hdfs_files
             ),
         )

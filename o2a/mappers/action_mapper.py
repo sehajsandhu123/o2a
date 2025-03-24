@@ -17,11 +17,11 @@ from abc import ABC
 from copy import deepcopy
 from typing import Any, List, Tuple
 from xml.etree.ElementTree import Element
-
+import json
 from o2a.converter.relation import Relation
 from o2a.converter.task import Task
 from o2a.mappers.base_mapper import BaseMapper
-
+from o2a_lib import functions
 from o2a.o2a_libs.src.o2a_lib.property_utils import PropertySet
 
 from o2a.utils.config_extractors import (
@@ -63,16 +63,23 @@ class ActionMapper(BaseMapper, ABC):
 
     def _parse_config(self):
         job_xml_nodes = find_nodes_by_tag(self.oozie_node, TAG_JOB_XML)
+
         job_xml_properties = extract_properties_from_job_xml_nodes(
             job_xml_nodes=job_xml_nodes, input_directory_path=self.input_directory_path
         )
         self.props.action_node_properties.update(job_xml_properties)
+        
+        # Store all job-xml paths
+        self.props.action_node_paths = [node.text for node in job_xml_nodes if node.text and node.text.strip()] if job_xml_nodes else []
+        self.props.action_node_path = self.props.action_node_paths[0] if self.props.action_node_paths else ""
 
         configuration_node = find_node_by_tag(self.oozie_node, TAG_CONFIGURATION)
         if configuration_node is not None:
             conf_node_properties = extract_properties_from_configuration_node(config_node=configuration_node)
             self.props.action_node_properties.update(conf_node_properties)
-
+            # Only update action_node_path if configuration_node.text is not empty/whitespace
+            if configuration_node.text and configuration_node.text.strip():
+                self.props.action_node_path = configuration_node.text
     @staticmethod
     def prepend_task(
         task_to_prepend: Task, tasks: List[Task], relations: List[Relation]

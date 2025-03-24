@@ -25,5 +25,5 @@
     ),
     gcp_conn_id=CONFIG['gcp_conn_id'],
     region=CONFIG['gcp_region'],
-    params={{ props_macro.props(action_node_properties=action_node_properties) }},
+    params={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path) }},
 )

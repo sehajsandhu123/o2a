@@ -14,6 +14,7 @@
 # limitations under the License.
 
 """Extractors for configuration and job-xml nodes"""
+import os
 from os import path
 from typing import Dict, List
 import xml.etree.ElementTree as ET
@@ -69,10 +70,16 @@ def extract_properties_from_job_xml_nodes(job_xml_nodes: List[ET.Element], input
                 "has the correct content."
             )
         file_path = path.join(file_name)
-        print(f"file_path: {file_path}")
+        if file_path.startswith("hdfs://"):
+            # Use hdfs dfs -get to fetch the file locally
+            local_tmp_file = "/tmp/job_xml_tmp.xml"
+            os.system(f"hdfs dfs -get {file_path} {local_tmp_file}")
+            file_path = local_tmp_file
+        
         config_tree = ET.parse(file_path)
-        print(f"config_tree: {config_tree}")
-        print(f"config_tree XML content:\n{ET.tostring(config_tree.getroot(), encoding='unicode')}")
+        #print(f"file_path: {file_path}")
+        #print(f"config_tree: {config_tree}")
+        #print(f"config_tree XML content:\n{ET.tostring(config_tree.getroot(), encoding='unicode')}")
 
         config_node = config_tree.getroot()
         if not config_node:

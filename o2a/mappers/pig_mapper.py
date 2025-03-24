@@ -66,6 +66,7 @@ class PigMapper(ActionMapper):
                 params_dict=self.params_dict,
                 script_file_name=self.script_file_name,
                 action_node_properties=self.props.action_node_properties,
+                action_node_path=self.props.action_node_path,
             ),
         )
         tasks = [action_task]

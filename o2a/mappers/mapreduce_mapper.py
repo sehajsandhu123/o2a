@@ -64,6 +64,7 @@ class MapReduceMapper(ActionMapper):
                 hdfs_files=self.hdfs_files,
                 hdfs_archives=self.hdfs_archives,
                 action_node_properties=self.props.action_node_properties,
+                action_node_path=self.props.action_node_path,
             ),
         )
         tasks = [action_task]

@@ -13,12 +13,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 #}
-{% macro props(action_node_properties, xml_escaped=False) -%}
+{% macro props(action_node_properties, action_node_path=None, xml_escaped=False) -%}
 {% if (action_node_properties is defined) and (action_node_properties | length != 0) -%}
     PropertySet(
         config=CONFIG,
         job_properties=JOB_PROPS,
-        action_node_properties={{ action_node_properties | to_python }}).{% if xml_escaped %}xml_escaped.{% endif %}merged
+        action_node_properties=functions.extract_properties_from_job_xml_nodes({{ action_node_path | to_python }})
+        ).{% if xml_escaped %}xml_escaped.{% endif %}merged
 {% else -%}
     PropertySet(
         config=CONFIG,

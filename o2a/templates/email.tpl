@@ -22,5 +22,5 @@
     bcc={{ bcc_addr | to_python }},
     subject={{ subject | to_python }},
     html_content={{ body | to_python }},
-    params={{ props_macro.props(action_node_properties=action_node_properties) }},
+    params={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path) }},
 )

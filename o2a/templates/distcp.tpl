@@ -20,5 +20,5 @@
     trigger_rule={{ trigger_rule | tojson }},
     bash_command={% include "hadoop_command.tpl" %} % (CONFIG['dataproc_cluster'], CONFIG['gcp_region'],
         {{ distcp_command | to_python }}),
-    params={{ props_macro.props(action_node_properties=action_node_properties) }},
+    params={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path) }},
 )

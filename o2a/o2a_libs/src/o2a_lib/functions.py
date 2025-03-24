@@ -17,7 +17,9 @@ EL functions map module.
 """
 import re
 import json
-
+import os
+import os.path as path
+import xml.etree.ElementTree as ET
 from . import el_wf_functions as wf_functions
 from . import el_fs_functions as fs_functions
 
@@ -164,6 +166,52 @@ def resolve_variables(config_dict):
                 # Keep original if variables can't be resolved
                 pass
     return resolved
+
+def extract_properties_from_job_xml_nodes(xml_file_path):
+    """Extracts configuration properties from an XML file, supporting both local and HDFS file paths."""
+    properties_dict = {}
+    
+    if not xml_file_path:
+        print("Warning: No file path provided.")
+        return properties_dict
+    
+    try:
+        if xml_file_path.startswith("hdfs://"):
+            # Use hdfs dfs -get to fetch the file locally
+            local_tmp_file = "/tmp/job_xml_tmp.xml"
+            os.system(f"hdfs dfs -get {xml_file_path} {local_tmp_file}")
+            xml_file_path = local_tmp_file
+        
+        # Local File Handling
+        if not os.path.exists(xml_file_path):
+            print(f"Warning: File does not exist: {xml_file_path}")
+            return properties_dict
+        
+        with open(xml_file_path, "r") as f:
+            xml_content = f.read()
+        
+        # Parse XML
+        config_tree = ET.ElementTree(ET.fromstring(xml_content))
+        config_node = config_tree.getroot()
+        
+        if not config_node:
+            return properties_dict
+        
+        for prop in config_node.findall("property"):
+            name = prop.find("name").text if prop.find("name") is not None else None
+            value = prop.find("value").text if prop.find("value") is not None else None
+            print(f"name_node: {name}, value_node: {value}")
+            
+            if name:
+                properties_dict[name] = value
+        
+        # Clean up temp file
+        if xml_file_path == "/tmp/job_xml_tmp.xml":
+            os.remove(xml_file_path)
+    except Exception as e:
+        print(f"Error parsing {xml_file_path}: {e}")
+    
+    return properties_dict
 
 FUNCTION_MAP = {
     "wf_id": "run_id",

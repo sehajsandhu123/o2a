@@ -29,5 +29,5 @@
     # Execute the shell command
     {{ pig_command }}
     """,
-    params={{ props_macro.props(action_node_properties=action_node_properties) }},
+    params={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path) }},
 )

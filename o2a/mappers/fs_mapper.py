@@ -157,6 +157,6 @@ class FsMapper(ActionMapper):
             task_id=task_id,
             template_name="fs_op.tpl",
             template_params=dict(
-                pig_command=pig_command, action_node_properties=self.props.action_node_properties
+                pig_command=pig_command, action_node_properties=self.props.action_node_properties, action_node_path=self.props.action_node_path
             ),
         )

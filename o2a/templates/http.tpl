@@ -19,5 +19,5 @@
     task_id={{ task_id | to_python }},
     trigger_rule={{ trigger_rule | to_python }},
     bash_command={% include "http_command.tpl" %},
-    params={{ props_macro.props(action_node_properties=action_node_properties) }},
+    params={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path) }},
 )

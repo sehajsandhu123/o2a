@@ -24,7 +24,7 @@
       ),
       hive_job=dict(
         {% if variables %}script_variables={{ variables | to_python }},{% endif %}
-        properties={{ props_macro.props(action_node_properties=action_node_properties, xml_escaped=True) }},
+        properties={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path, xml_escaped=True) }},
         {% if script %}query_file_uri='{}/{}'.format(CONFIG['gcp_uri_prefix'], {{ script | to_python }}),{% endif %}
         {% if query_obj %}query_list={{ query_obj | to_python }},{% endif %}
       ),

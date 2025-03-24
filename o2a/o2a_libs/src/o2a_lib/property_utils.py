@@ -16,7 +16,7 @@
 """Stores property set for use in particular actions"""
 import copy
 import json
-from typing import Dict
+from typing import Dict, List
 from xml.sax.saxutils import escape
 
 
@@ -36,10 +36,14 @@ class PropertySet:
         job_properties: Dict[str, str] = None,
         config: Dict[str, str] = None,
         action_node_properties: Dict[str, str] = None,
+        action_node_path: str = None,
+        action_node_paths: List[str] = None,
     ):
         self.job_properties: Dict[str, str] = job_properties or {}
         self.config: Dict[str, str] = config or {}
         self.action_node_properties: Dict[str, str] = action_node_properties or {}
+        self.action_node_paths: List[str] = action_node_paths or []
+        self.action_node_path: str = action_node_path or (self.action_node_paths[0] if self.action_node_paths else "")
 
     @property
     def xml_escaped(self):
@@ -48,25 +52,29 @@ class PropertySet:
         escaped_ps.action_node_properties = {
             k: escape(v) for k, v in escaped_ps.action_node_properties.items()
         }
+        escaped_ps.action_node_paths = [escape(path) for path in escaped_ps.action_node_paths]
+        escaped_ps.action_node_path = escape(escaped_ps.action_node_path)
         return escaped_ps
 
     @property
     def merged(self) -> Dict[str, str]:
         """
         Those are merged job and action node properties.
-        :return:
+        :return: Dictionary of merged properties
         """
-        # not optimal but allows to modify properties in job.properties/action_node_properties at any time
         merged_props: Dict[str, str] = {}
         merged_props.update(self.job_properties)
         merged_props.update(self.action_node_properties)
+        # Don't update with action_node_path as it's a string, not a dict
         return merged_props
 
     def __repr__(self) -> str:
         return (
             f"PropertySet(config={json.dumps(self.config, indent=2)}, "
             f"job_properties={json.dumps(self.job_properties, indent=2)}, "
-            f"action_node_properties={json.dumps(self.action_node_properties, indent=2)})"
+            f"action_node_properties={json.dumps(self.action_node_properties, indent=2)}, "
+            f"action_node_paths={json.dumps(self.action_node_paths, indent=2)}, "
+            f"action_node_path={json.dumps(self.action_node_path, indent=2)})"
         )
 
     def __eq__(self, other):
@@ -75,4 +83,6 @@ class PropertySet:
             and self.config == other.config
             and self.job_properties == other.job_properties
             and self.action_node_properties == other.action_node_properties
+            and self.action_node_paths == other.action_node_paths
+            and self.action_node_path == other.action_node_path
         )

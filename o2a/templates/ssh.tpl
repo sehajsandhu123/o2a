@@ -25,5 +25,5 @@
     trigger_rule={{ trigger_rule | to_python }},
     ssh_hook={{ task_id | to_var }}_hook,
     command={{ command | to_python }},
-    params={{ props_macro.props(action_node_properties=action_node_properties) }},
+    params={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path) }},
 )
