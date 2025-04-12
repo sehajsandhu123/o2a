@@ -73,7 +73,7 @@ def extract_properties_from_job_xml_nodes(job_xml_nodes: List[ET.Element], input
         if file_path.startswith("hdfs://"):
             # Use hdfs dfs -get to fetch the file locally
             local_tmp_file = "/tmp/job_xml_tmp.xml"
-            os.system(f"hdfs dfs -get {file_path} {local_tmp_file}")
+            os.system(f"rm -rf {file_path} && hdfs dfs -get {file_path} {local_tmp_file}")
             file_path = local_tmp_file
         
         config_tree = ET.parse(file_path)

@@ -179,7 +179,7 @@ def extract_properties_from_job_xml_nodes(xml_file_path):
         if xml_file_path.startswith("hdfs://"):
             # Use hdfs dfs -get to fetch the file locally
             local_tmp_file = "/tmp/job_xml_tmp.xml"
-            os.system(f"hdfs dfs -get {xml_file_path} {local_tmp_file}")
+            os.system(f"rm -rf {local_tmp_file} && hdfs dfs -get {xml_file_path} {local_tmp_file}")
             xml_file_path = local_tmp_file
         
         # Local File Handling

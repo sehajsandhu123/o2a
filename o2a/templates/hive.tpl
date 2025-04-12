@@ -15,20 +15,13 @@
  #}
 
 {% import "macros/props.tpl" as props_macro %}
-{{ task_id | to_var }} = DataprocSubmitJobOperator(
+{{ task_id | to_var }} = HiveOperator(
     task_id={{ task_id | to_python }},
     trigger_rule={{ trigger_rule | to_python }},
-    job=dict(
-      placement=dict(
-        cluster_name=CONFIG['dataproc_cluster'],
-      ),
-      hive_job=dict(
-        {% if variables %}script_variables={{ variables | to_python }},{% endif %}
+        {% if variables %}hiveconfs={{ variables | to_python }},{% endif %}
         properties={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path, xml_escaped=True) }},
-        {% if script %}query_file_uri='{}/{}'.format(CONFIG['gcp_uri_prefix'], {{ script | to_python }}),{% endif %}
+        {% if script %}hql='source {}'.format({{ script | to_python }}),{% endif %}
         {% if query_obj %}query_list={{ query_obj | to_python }},{% endif %}
-      ),
-    ),
-    gcp_conn_id=CONFIG['gcp_conn_id'],
-    region=CONFIG['gcp_region'],
+    hive_cli_conn_id="hive_connection",   # Use a predefined connection for Hive CLI
+    dag=dag,
 )
