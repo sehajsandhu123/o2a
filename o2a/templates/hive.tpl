@@ -19,7 +19,7 @@
     task_id={{ task_id | to_python }},
     trigger_rule={{ trigger_rule | to_python }},
         {% if variables %}hiveconfs={{ variables | to_python }},{% endif %}
-        properties={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path, xml_escaped=True) }},
+        params={{ props_macro.props(action_node_properties=action_node_properties, action_node_path=action_node_path, xml_escaped=True) }},
         {% if script %}hql='source {}'.format({{ script | to_python }}),{% endif %}
         {% if query_obj %}query_list={{ query_obj | to_python }},{% endif %}
     hive_cli_conn_id="hive_connection",   # Use a predefined connection for Hive CLI
