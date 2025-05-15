@@ -1,1130 +1,605 @@
-<!--
-  Copyright 2019 Google LLC
+﻿O2A documentation![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.001.png)
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+How to convert Workflows to DAGs
 
-  http://www.apache.org/licenses/LICENSE-2.0
+System requirements
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
-# Oozie to Airflow
+Install O2A 
 
-[![codecov](https://codecov.io/gh/GoogleCloudPlatform/oozie-to-airflow/branch/master/graph/badge.svg)](https://codecov.io/gh/GoogleCloudPlatform/oozie-to-airflow)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3](https://pyup.io/repos/github/GoogleCloudPlatform/oozie-to-airflow/python-3-shield.svg)](https://pyup.io/repos/github/GoogleCloudPlatform/oozie-to-airflow/)
+Structure of the application folder for workflows Bulk workflow conversion
 
-A tool to easily convert between [Apache Oozie](http://oozie.apache.org/) workflows
-and [Apache Airflow](https://airflow.apache.org) workflows.
+Shell Example
 
-The program targets Apache Airflow >= 2.x and Apache Oozie 1.0 XML schema.
+Prerequisites
 
-If you want to contribute to the project, please take a look at [CONTRIBUTING.md](CONTRIBUTING.md)
+Running Output
 
-# Table of Contents
+Hive/Hive2 Example Prerequisites
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+Running Output
 
+Known limitations
 
-- [Background](#background)
-- [Running the Program](#running-the-program)
-  - [Installing from PyPi](#installing-from-pypi)
-  - [Installing from sources](#installing-from-sources)
-  - [Running the conversion](#running-the-conversion)
-  - [Structure of the application folder](#structure-of-the-application-folder)
-  - [The o2a libraries](#the-o2a-libraries)
-- [Supported Oozie features](#supported-oozie-features)
-  - [Control nodes](#control-nodes)
-  - [EL Functions](#el-functions)
-  - [Workflow and node notifications](#workflow-and-node-notifications)
-- [Airflow-specific optimisations](#airflow-specific-optimisations)
-  - [Removing unnecessary control nodes](#removing-unnecessary-control-nodes)
-  - [Removing inaccessible nodes](#removing-inaccessible-nodes)
-- [Common Known Limitations](#common-known-limitations)
-  - [File/Archive functionality](#filearchive-functionality)
-  - [Not all global configuration methods are supported](#not-all-global-configuration-methods-are-supported)
-  - [Support for uber.jar feature](#support-for-uberjar-feature)
-  - [Support for .so and .jar lib files](#support-for-so-and-jar-lib-files)
-  - [Custom messages missing for Kill Node](#custom-messages-missing-for-kill-node)
-  - [Capturing output is not supported](#capturing-output-is-not-supported)
-  - [Subworkflow DAGs must be placed in examples](#subworkflow-dags-must-be-placed-in-examples)
-  - [EL functions support](#el-functions-support)
-  - [Notification proxy is not supported](#notification-proxy-is-not-supported)
-- [Cloud execution environment for Oozie to Airflow conversion](#cloud-execution-environment-for-oozie-to-airflow-conversion)
-  - [Cloud environment setup](#cloud-environment-setup)
-- [Examples](#examples)
-  - [EL Example](#el-example)
-  - [SSH Example](#ssh-example)
-  - [Email Example](#email-example)
-  - [MapReduce Example](#mapreduce-example)
-  - [FS Example](#fs-example)
-  - [Java Example](#java-example)
-  - [Pig Example](#pig-example)
-  - [Shell Example](#shell-example)
-  - [Spark Example](#spark-example)
-  - [Sub-workflow Example](#sub-workflow-example)
-  - [DistCp Example](#distcp-example)
-  - [Decision Example](#decision-example)
-  - [Hive/Hive2 Example](#hivehive2-example)
-  - [Demo Example](#demo-example)
-  - [Childwf Example](#childwf-example)
+Errors you might face
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+HDFS Filepath exception
 
-# Background
+HDFS File Paths in hiveconfs
 
-Apache Airflow is a workflow management system developed by AirBnB in 2014.
-It is a platform to programmatically author, schedule, and monitor workflows.
-Airflow workflows are designed as [Directed Acyclic Graphs](https://airflow.apache.org/tutorial.html#example-pipeline-definition)
-(DAGs) of tasks in Python. The Airflow scheduler executes your tasks on an array of
-workers while following the specified dependencies.
+Hive DAG: Cannot modify \*\*\*.ctx.try\_number at runtime Skeleton Transformation
 
-Apache Oozie is a workflow scheduler system to manage Apache Hadoop jobs.
-Oozie workflows are also designed as [Directed Acyclic Graphs](https://oozie.apache.org/docs/3.1.3-incubating/DG_Overview.html)
-(DAGs) in XML.
+Decision Node
 
-There are a few differences noted below:
+Features that are not supported
 
+Oozie workflow EL Functions Coordinator job conversion
 
-|         | Spec.  | Task        | Dependencies                    | "Subworkflows" | Parameterization             | Notification        |
-|---------|--------|-------------|---------------------------------|----------------|------------------------------|---------------------|
-| Oozie   | XML    | Action Node | Control Node                    | Subworkflow    | EL functions/Properties file | URL based callbacks |
-| Airflow | Python | Operators   | Trigger Rules, set_downstream() | SubDag         | jinja2 and macros            | Callbacks/Emails    |
+How to convert Workflows to DAGs
 
-
-# Running the Program
+System requirements
 
 Note that you need Python >= 3.8 to run the converter.
 
-## Installing from PyPi
+Install O2A 
 
-You can install `o2a` from PyPi via `pip install o2a`. After installation, the
-[o2a](bin/o2a) and [o2a-validate-workflows](bin/o2a-validate-workflows) should be available on your path.
+First thing we need to do is build the required pip packages and install it on all airflow workers and the node on which we are converting workflows to DAGs
 
-## Installing from sources
+1  s our ce  / us r / odp/ 3. 2. 3. 3- 3/ ai r f l ow/ bi n/ act i vat e
+1  pi p  i ns t al l  o2a- accel dat a
+1  pi<a name="_page0_x31.50_y579.00"></a> p  i ns t al l  o2a- l i b- accel dat a
+1  pi p  i ns t al l  - - upgr ade  wr apt
 
-1. (Optional) Install virtualenv:
+T<a name="_page0_x61.50_y615.75"></a>his is the full usage guide for o2a as shown below
 
-    In case you use sources of `o2a`, the environment can be set up via the virtualenv setup
-(you can create one using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/)
-for example).
+1 ( ai r f l ow)  [ r oot @ai r f l owdemonode01  o2a] #  . / bi n/ o2a  - hel p 2
 
-2. Install Oozie-to-Airflow - you have 2 options to do so:
+3 us age:  o2a  [ - h]  - i  I NPUT\_DI RECTORY\_PATH  - o  OUTPUT\_DI RECTORY\_PATH  [ - n  DAG\_NAME]  [ - u  USER]  [ - s  START\_DAYS\_AGO]
 
-    1. automatically: install `o2a` from local folder using `pip install -e .`
+[ - x  SCHEMA\_VERSI ON]  [ - s kv  SKI P\_VALI DATI ON]
 
-        This will take care about, among others, adding the [bin](bin) subdirectory to the PATH.
+<a name="_page0_x31.50_y691.50"></a>4 [ - v  SCHEDULE\_I NTERVAL]  [ - d]
 
-    2. more manually:
+5
 
-        1. While in your virtualenv, you can install all the requirements via `pip install -r requirements.txt`.
+6  Conver t  Apache  Oozi e  wor kf l ows  t o  Apache  Ai r f l ow  wor kf l ows .
+6  opt i ons :
+8  - h,  - - hel p             s how  t hi s  hel p  mes s age  and  exi t![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.002.png)
+8  - i  I NPUT\_DI RECTORY\_PATH,  - - i nput - di r ect or y- pat h  I NPUT\_DI RECTORY\_PATH
 
-        2. You can add the [bin](bin) subdirectory to your
-        PATH, then all the scripts below can be run without adding the `./bin` prefix.
-        This can be done for example by adding a line similar to the one below to your `.bash_profile`
-        or `bin/postactivate` from your virtual environment:
+10 Pat h  t o  i nput  di r ect or y
 
-        ```bash
-        export PATH=${PATH}:<INSERT_PATH_TO_YOUR_OOZIE_PROJECT>/bin
-        ```
+11 - o  OUTPUT\_DI RECTORY\_PATH,  - - out put - di r ect or y- pat h  OUTPUT\_DI RECTORY\_PATH 12 Des i r ed  out put  di r ect or y 13 - n  DAG\_NAME,  - - dag- name  DAG\_NAME 14 Des i r ed  DAG  name  [ def aul t s  t o  i nput  di r ect or y  name]
 
-        Otherwise you need to run all the scripts from the bin subdirectory, for example:
+15  - u  USER,  - - us er  USER   The  us er  t o  be  us ed  i n  pl ace  of  al l  ${us er . name}  [ def aul t s  t o  us er  who  r an  t he conver s i on]
+15  - s  START\_DAYS\_AGO,  - - s t ar t - days - ago  START\_DAYS\_AGO
 
-        ```bash
-        ./bin/o2a --help
-        ```
+17 Des i r ed  DAG  s t ar t  as  number  of  days  ago 18 - x  SCHEMA\_VERSI ON,  - - s chema- ver s i on  SCHEMA\_VERSI ON 19 Des i r ed  Oozi e  al l  s chema  ver s i on. [ 1. 0, 0. 4] 20 - s kv  SKI P\_VALI DATI ON,  - - s ki p- val i dat i on  SKI P\_VALI DATI ON 21 s ki p  val i dat i on 22 - v  SCHEDULE\_I NTERVAL,  - - s chedul e- i nt er val  SCHEDULE\_I NTERVAL 23 Des i r ed  DAG  s chedul e  i nt er val  as  number  of  days 24 - d,  - - dot              Render s  wor kf l ow  f i l es  i n  DOT  f or mat
 
-In all the example commands below, it is assumed that the [bin](bin) directory is in your PATH -
-either installed from PyPi or from the sources.
-
-## Running the conversion
-
-You can run the program by calling:
-`o2a -i <INPUT_APPLICATION_FOLDER> -o <OUTPUT_FOLDER_PATH>`
-
-Example:
-`o2a -i examples/demo -o output/demo`
-
-This is the full usage guide, available by running `o2a -h`
-
-```
-usage: o2a [-h] -i INPUT_DIRECTORY_PATH -o OUTPUT_DIRECTORY_PATH [-n DAG_NAME]
-           [-u USER] [-s START_DAYS_AGO] [-v SCHEDULE_INTERVAL] [-d]
-
-Convert Apache Oozie workflows to Apache Airflow workflows.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -i INPUT_DIRECTORY_PATH, --input-directory-path INPUT_DIRECTORY_PATH
-                        Path to input directory
-  -o OUTPUT_DIRECTORY_PATH, --output-directory-path OUTPUT_DIRECTORY_PATH
-                        Desired output directory
-  -n DAG_NAME, --dag-name DAG_NAME
-                        Desired DAG name [defaults to input directory name]
-  -u USER, --user USER  The user to be used in place of all ${user.name}
-                        [defaults to user who ran the conversion]
-  -s START_DAYS_AGO, --start-days-ago START_DAYS_AGO
-                        Desired DAG start as number of days ago
-  -v SCHEDULE_INTERVAL, --schedule-interval SCHEDULE_INTERVAL
-                        Desired DAG schedule interval as number of days
-  -d, --dot             Renders workflow files in DOT format
-```
-
-## Structure of the application folder
+Structure of the application folder for workflows
 
 The input application directory has to follow the structure defined as follows:
 
-```
-<APPLICATION>/
-             |- job.properties        - job properties that are used to run the job
-             |- hdfs                  - folder with application - should be copied to HDFS
-             |     |- workflow.xml    - Oozie workflow xml (1.0 schema)
-             |     |- ...             - additional folders required to be copied to HDFS
-             |- configuration.template.properties - template of configuration values used during conversion
-             |- configuration.properties          - generated properties for configuration values
-```
-
-## The o2a libraries
-
-Converted Airflow DAGs use common libraries. Those libraries should be available on PYTHONPATH for all
-Airflow components - scheduler, webserver and workers - so that they can be imported when DAGs are parsed.
-
-Those libraries are in [o2a/o2a_libs](o2a/o2a_libs) folder and the easiest way to make them available to
-all the DAGs is to install them from [PyPi](https://pypi.org/project/o2a-lib/) via `pip install o2a-lib`.
-
-
-# Supported Oozie features
-
-## Control nodes
-### Fork and Join
-
-A [fork node](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.1.5_Fork_and_Join_Control_Nodes)
-splits the path of execution into multiple concurrent paths of execution.
-
-A [join node](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.1.5_Fork_and_Join_Control_Nodes)
-waits until every concurrent execution of the previous fork node arrives to it. The fork and join nodes must be used in pairs. The join node
-assumes concurrent execution paths are children of the same fork node.
-~~~~
-<workflow-app name="[WF-DEF-NAME]" xmlns="uri:oozie:workflow:0.1">
-    ...
-    <fork name="[FORK-NODE-NAME]">
-        <path start="[NODE-NAME]" />
-        ...
-        <path start="[NODE-NAME]" />
-    </fork>
-    ...
-    <join name="[JOIN-NODE-NAME]" to="[NODE-NAME]" />
-    ...
-</workflow-app>
-~~~~
-
-### Decision
-
-A [decision node](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.1.4_Decision_Control_Node)
-enables a workflow to make a selection on the execution path to follow.
-
-The behavior of a decision node can be seen as a switch-case statement.
-
-A decision node consists of a list of predicates-transition pairs plus a default transition. Predicates are evaluated in order or appearance until one of them evaluates to true and the corresponding transition is taken. If none of the predicates evaluates to true the default transition is taken.
-
-Predicates are JSP Expression Language (EL) expressions (refer to section 4.2 of this document) that resolve into a boolean value, true or false . For example:
-`${fs:fileSize('/usr/foo/myinputdir') gt 10 * GB}`
-
-~~~~
-<workflow-app name="[WF-DEF-NAME]" xmlns="uri:oozie:workflow:0.1">
-    ...
-    <decision name="[NODE-NAME]">
-        <switch>
-            <case to="[NODE_NAME]">[PREDICATE]</case>
-            ...
-            <case to="[NODE_NAME]">[PREDICATE]</case>
-            <default to="[NODE_NAME]"/>
-        </switch>
-    </decision>
-    ...
-</workflow-app>
-~~~~
-### Start
-
-The [start node](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.1.1_Start_Control_Node)
-is the entry point for a workflow job, it indicates the first workflow node the workflow job must transition to.
+1 <APPLI CATI ON>/
 
-When a workflow is started, it automatically transitions to the node specified in the start .
+2 | -  j ob. pr oper t i es         -  j ob  pr oper t i es  t hat  ar e  us ed  t o  r un  t he  j ob
 
-A workflow definition must have one start node.
+3 | -  hdf s                   -  f ol der  wi t h  appl i cat i on  -  s houl d  be  copi ed  t o  HDFS
 
-~~~~
-<workflow-app name="[WF-DEF-NAME]" xmlns="uri:oozie:workflow:0.1">
-  ...
-  <start to="[NODE-NAME]"/>
-  ...
-</workflow-app>
-~~~~
-### End
+<a name="_page1_x31.50_y347.25"></a>4 |      | -  wor kf l ow. xml     -  Oozi e  wor kf l ow  xml  ( 1. 0  s chema)
 
-The [end node](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.1.2_End_Control_Node)
-is the end for a workflow job, it indicates that the workflow job has completed successfully.
+5 |      | -  . . .              -  addi t i onal  f ol der s  r equi r ed  t o  be  copi ed  t o  HDFS
 
-When a workflow job reaches the end it finishes successfully (SUCCEEDED).
+6 | -  conf i gur at i on. t empl at e. pr oper t i es  -  t empl at e  of  conf i gur at i on  val ues  us ed  dur i ng  conver s i on 7 | -  conf i gur at i on. pr oper t i es           -  gener at ed  pr oper t i es  f or  conf i gur at i on  val ues
 
-If one or more actions started by the workflow job are executing when the end node is reached, the actions will be killed. In this scenario the workflow job is still considered as successfully run.
+After the o2a installation is done, we can start converting our workflows :- 
 
-A workflow definition must have one end node.
+1 . / bi n/ o2a  - i  . . / oozi e\_s ampl e/   - o  ai r f l ow\_s ampl e/  - x  0. 4  - s kv  t r ue 2
 
-~~~~
-<workflow-app name="[WF-DEF-NAME]" xmlns="uri:oozie:workflow:0.1">
-    ...
-    <end name="[NODE-NAME]"/>
-    ...
-</workflow-app>
-~~~~
+3  [ 2025- 04- 09T15: 45: 42. 663+0530]  {wor kf l ow\_xml \_par s er . py: 242}  I NFO  -  Par s ed  Emai l Er r or  as  Act i on  Node  of  t ype emai l .
+3  [ 2025- 04- 09T15: 45: 42. 663+0530]  {wor kf l ow\_xml \_par s er . py: 81}  I NFO  -  Par s ed  f ai l  as  Ki l l  Node.
+3  [ 2025- 04- 09T15: 45: 42. 664+0530]  {wor kf l ow\_xml \_par s er . py: 81}  I NFO  -  Par s ed  Ki l l  as  Ki l l  Node.
+3  [ 2025- 04- 09T15: 45: 42. 664+0530]  {wor kf l ow\_xml \_par s er . py: 94}  I NFO  -  Par s ed  End  as  End  Node.
+3  [ 2025- 04- 09T15: 45: 42. 664+0530]  {oozi e\_conver t er . py: 189}  I NFO  -  Appl yi ng  pr e- conver t  t r ans f or mer s
+3  [ 2025- 04- 09T15: 45: 42. 664+0530]  {oozi e\_conver t er . py: 125}  I NFO  -  Conver t i ng  nodes  t o  t as ks  and  i nner  r el at i ons
+3  [ 2025- 04- 09T15: 45: 42. 693+0530]  {oozi e\_conver t er . py: 194}  I NFO  -  Appl yi ng  pos t - conver t  t r ans f or mer s
+3  [ 2025- 04- 09T15: 45: 42. 693+0530]  {oozi e\_conver t er . py: 173}  I NFO  -  Addi ng  er r or  handl er s
+3  [ 2025- 04- 09T15: 45: 42. 693+0530]  {oozi e\_conver t er . py: 155}  I NFO  -  Conver t i ng  r el at i ons  bet ween  t as ks  gr oups .
+3  [ 2025- 04- 09T15: 45: 42. 693+0530]  {oozi e\_conver t er . py: 150}  I NFO  -  Conver t i ng  dependenci es .
+3  [ 2025- 04- 09T15: 45: 42. 694+0530]  {r ender er s . py: 104}  I NFO  -  Savi ng  t o  f i l e:  di s ht i or i gi nal j ob2/ . py
+3  Fi xi ng  / r oot / o2a/ di s ht i or i gi nal j ob2/ . py
 
-### Kill
+After the conversion is completed you will get your DAG in the specified folder 
 
-The [kill node](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.1.3_Kill_Control_Node)
-allows a workflow job to exit with an error.
+Bulk workflow conversion
 
-When a workflow job reaches the kill it finishes in error (KILLED).
+If we wish to convert all jobs in a single go, we can use the  s et up\_o2a\_bul k. s h script to convert our workflows to DAGs, to use it, we basically just need to keep all our workflows in a single directory as shown below
 
-If one or more actions started by the workflow job are executing when the kill node is reached, the actions will be killed.
+<a name="_page1_x31.50_y948.75"></a>1 <PARENT- DI R>/
 
-A workflow definition may have zero or more kill nodes.
+2 | -  wor kf l ow1![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.003.png)
 
-~~~~
-<workflow-app name="[WF-DEF-NAME]" xmlns="uri:oozie:workflow:0.1">
-    ...
-    <kill name="[NODE-NAME]">
-        <message>[MESSAGE-TO-LOG]</message>
-    </kill>
-    ...
-</workflow-app>
-~~~~
+3 | -  wor kf l ow. xml .    -  -  Oozi e  wor kf l ow  xml 
 
-## EL Functions
+4 | -  conf i gur at i on. pr oper t i es
 
-As of now, a very minimal set of [Oozie EL](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a4.2_Expression_Language_Functions)
-functions are supported. The way they work is that an EL expression is being translated to
-a jinja template. The translation is performed using [Lark](https://lark-parser.readthedocs.io/en/latest/).
-All required variables should be passed in `job.properties`. Equivalents of EL functions can be found in
-`o2a_libs/functions.py`.
+5 | -  j ob. pr oper t i es
 
-For example the following EL expression
-```${wf:user() == firstNotNull(arg1, arg2)}```
-is translated to the following jinja equivalent:
-```{{functions.wf.user() == functions.first_not_null(arg1, arg2)}}```
-and it requires that `job.properties` includes values for `arg1` and `arg2`.
+6 | -  wor kf l ow2              
 
-This design allows for custom EL function mapping if one so chooses. By
-default everything gets mapped to the module `o2a_libs.functions`. This means in
-order to use EL function mapping, the folder `o2a_libs.functions` should
-be copied over to the Airflow DAG folder. This should then be picked up and
-parsed by the Airflow workers and then available to all DAGs.
+7 | -  wor kf l ow. xml     -  Oozi e  wor kf l ow  xml 
 
-## Workflow and node notifications
+8 | -  conf i gur at i on. pr oper t i es
 
-Workflow jobs can be configured to make an HTTP GET notification upon start and end of a workflow action node
-and upon the start and completion of a workflow job. More information in [Oozie docs](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a5_Workflow_Notifications).
+9 | -  j ob. pr oper t i es
 
-Oozie-to-Airflow supports this feature.
-The `job.properties` file has contain URLs for workflow and action node notifications - example below:
+10 | -  . . .              -  addi t i onal  f ol der s  r equi r ed  t o  be  copi ed  t o  HDFS
 
-```
-oozie.wf.workflow.notification.url=http://example.com/workflow?job-id=$jobId&status=$status
-oozie.wf.action.notification.url=http://example.com/action?job-id=$jobId&node-name=$nodeName&status=$status
-```
+The  s et up\_o2a\_bul k. s h  will take care of setting up the workflow & itʼs config files in the required input dir structure, which will be as shown below
 
-If they are present, Oozie-to-Airflow will insert additional `BashOperator` to the generated DAG
-for each notification to be sent, right before or after the appropriate node (for node notifications) or at the beginning or end
-of the workflow (for workflow notifications).
-Inside the `BashOperator` will use `curl` to send an HTTP GET request to the appropriate URL endpoint.
+1  [ r oot @ai r f l owdemonode01  o2a] #  bas h  s et up\_o2a\_bul k. s h  - f  ~/ bul k\_j ob![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.004.png)
+1  [ 2025- 04- 25  14: 22: 39]  [ I NFO]  St ar t i ng  conver s i on  pr oces s  f or  / r oot / bul k\_j ob
+1  [ 2025- 04- 25  14: 22: 39]  [ I NFO]  Cr eat ed  di r ect or y  s t r uct ur e  i n  / r oot / bul k\_j ob\_CONVERTED
+1  [ 2025- 04- 25  14: 22: 39]  [ WARN]  conf i gur at i on. pr oper t i es  not  f ound
+1  [ 2025- 04- 25  14: 22: 39]  [ I NFO]  Pr oces s ed  s ubwor kf l ow  act i on:  hi ve2\_act i on
+1  [ 2025- 04- 25  14: 22: 39]  [ WARN]  conf i gur at i on. pr oper t i es  not  f ound
+1  [ 2025- 04- 25  14: 22: 39]  [ I NFO]  Pr oces s ed  s hel l  act i on:  s ehaj \_er r or s \_s ampl e
+1  [ 2025- 04- 25  14: 22: 39]  [ I NFO]  Set up  compl et ed  f or  / r oot / bul k\_j ob.  You  can  now  r un  . / r un\_o2a\_bul k. s h  t o  per f or m t he  conver s i on.
+1  [ 2025- 04- 25  14: 22: 39]  [ I NFO]  Log  f i l es  ar e  s t or ed  i n:  / r oot / bul k\_j ob\_CONVERTED/ l ogs
 
-Example DAG without notifications:
+1 <APPLI CATI ON>/![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.005.png)
 
-![dag without notifications](images/childwf_without_notifications.png)
+2 | -  j ob. pr oper t i es         -  j ob  pr oper t i es  t hat  ar e  us ed  t o  r un  t he  j ob
 
-The same DAG with notifications:
+3 | -  hdf s                   -  f ol der  wi t h  appl i cat i on  -  s houl d  be  copi ed  t o  HDFS
 
-![dag with notifications](images/childwf_with_notifications.png)
+4 |      | -  wor kf l ow. xml     -  Oozi e  wor kf l ow  xml  ( 1. 0  s chema)
 
-# Airflow-specific optimisations
+5 |      | -  . . .              -  addi t i onal  f ol der s  r equi r ed  t o  be  copi ed  t o  HDFS
 
-Due to the fact that Oozie and Airflow differ with regards to some aspects of running workflows,
-there may be some differences in the output Airflow DAG with regards to the Oozie XML.
+6 | -  conf i gur at i on. t empl at e. pr oper t i es  -  t empl at e  of  conf i gur at i on  val ues  us ed  dur i ng  conver s i on 7 | -  conf i gur at i on. pr oper t i es           -  gener at ed  pr oper t i es  f or  conf i gur at i on  val ues
 
-## Removing unnecessary control nodes
+after this structure is setup, we can start our conversion by using  r un\_o2a\_bul k. s h :-![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.006.png)
 
-In Airflow you don't need as many explicit control nodes as in Oozie. For example you don't ever need a Start
-node and in most cases End is also not needed.
+1  [ r oot @ai r f l owdemonode01  o2a] #  . / r un\_o2a\_bul k. s h![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.007.png)
+1  [ 2025- 04- 25  14: 22: 45]  [ I NFO]  St ar t i ng  bul k  conver s i on  pr oces s
+1  [ 2025- 04- 25  14: 22: 45]  [ I NFO]  Conver t i ng  s hel l  act i on:  s ehaj \_er r or s \_s ampl e
+1  [ 2025- 04- 25  14: 22: 45]  [ I NFO]  I nput  di r ect or y:  / r oot / bul k\_j ob\_CONVERTED/ s hel l \_act i ons / s ehaj \_er r or s \_s ampl e
+1  [ 2025- 04- 25  14: 22: 45]  [ I NFO]  Out put  di r ect or y:  / r oot / bul k\_j ob\_CONVERTED/ out put / s hel l \_s ehaj \_er r or s \_s ampl e
+1  [ 2025- 04- 25T14: 23: 40. 819+0530]  {oozi e\_conver t er . py: 173}  I NFO  -  Addi ng  er r or  handl er s
+1  [ 2025- 04- 25T14: 23: 40. 819+0530]  {oozi e\_conver t er . py: 155}  I NFO  -  Conver t i ng  r el at i ons  bet ween  t as ks  gr oups .
+1  [ 2025- 04- 25T14: 23: 40. 819+0530]  {oozi e\_conver t er . py: 150}  I NFO  -  Conver t i ng  dependenci es .
+1  [ 2025- 04- 25T14: 23: 40. 819+0530]  {r ender er s . py: 104}  I NFO  -  Savi ng  t o  f i l e: / r oot / bul k\_j ob\_CONVERTED/ out put / s hel l \_s ehaj \_er r or s \_s ampl e/ s ehaj \_er r or s \_s ampl e. py
+1  Fi xi ng  / r oot / bul k\_j ob\_CONVERTED/ out put / s hel l \_s ehaj \_er r or s \_s ampl e/ s ehaj \_er r or s \_s ampl e. py
+1  [ 2025- 04- 25  14: 23: 41]  [ I NFO]  Conver s i on  s ucces s f ul  f or  s ehaj \_er r or s \_s ampl e
+1  [ 2025- 04- 25  14: 23: 44]  [ I NFO]  Bul k  conver s i on  compl et ed
 
-We introduced the concept of `Transformers` in O2A, which modify the workflow. Below are the ones that
-remove unnecessary control nodes:
+After the conversion is completed you will get your DAG in the specified folder             ( bul k\_j ob\_CONVERTED in this case)![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.008.png)
 
-- `RemoveEndTransformer` - removes End nodes with all relations when it's not connected to a Decision node,
-- `RemoveKillTransformer` - removes Kill nodes with all relations when it's not connected to a Decision node,
-- `RemoveStartTransformer` - removes Start nodes with all relations,
-- `RemoveForkTransformer` - removes Fork nodes when there are no upstream nodes,
-- `RemoveJoinTransformer` - removes Join nodes when there are no downstream nodes.
+Shell Example ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.009.png)
 
-## Removing inaccessible nodes
+Prerequisites ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.010.png)
 
-In Oozie for a node to be executed it has to be able to be traced back to the Start node.
-If a node is "loose" and is not connected to Start in any way (directly or indirectly via its "parents") it
-will be skipped.
+Make sure to first copy  exampl es / s hel l / conf i gur at i on. t empl at e. pr oper t i es , rename it as  conf i gur at i on. pr oper t i es and fill in ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.011.png)![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.012.png)with configuration data.
 
-However in Airflow all tasks will be executed. Therefore in order to replicate the "skipping" of loose nodes
-behaviour of Oozie we need to remove nodes unconnected to Start during the conversion phase.
-
-This is achieved thanks to the `RemoveInaccessibleNodeTransformer`.
-
-# Common Known Limitations
-
-There are few limitations in the implementation of the Oozie-To-Airflow converter. It's not possible to
-write a converter that handles all cases of complex workflows from Ooozie because some of
-functionalities available are not possible to map easily to existing Airflow Operators or
-cannot be tested because of the current Dataproc + Composer limitations. Some of those limitations
-might be removed in the future. Below is a list of common known limitations that we are aware of for now.
-
-Many of those limitations are not blockers - the workflows will still be converted to Python DAGs
-and it should be possible to manually (or automatically) post-process the DAGs to add custom
-functionality. So even with those limitations in place you can still save a ton of work when
-converting many Oozie workflows.
-
-In the following, "Examples" section more specific per-action limitations are listed as well.
-
-## File/Archive functionality
-
-At the time of this writing we were not able to determine if file/archive
-functionality works as intended. While we map appropriate file/archive methods it seems that Oozie
-treats file/archive somewhat erraticaly. This is not a blocker to run most of the operations, however
-some particular complex workflows might be problematic. Further testing with real, production Oozie
-workflows is needed to verify our implementation.
-
-[Example Oozie docs](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.2.2.1_Adding_Files_and_Archives_for_the_Job)
-
-* [File/Archive in Pig doesn't work](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/243)
-
-## Not all global configuration methods are supported
-
-Oozie implements a number of ways how configuration parameters are passed to actions. Out of the existing
-configuration options the following ones are not supported (but can be easily added as needed):
-
-* [The config-default.xml file](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/137)
-* [Parameters section of workflow.xml](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/138)
-* [Handle Global configuration properties](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/134)
-
-## Support for uber.jar feature
-
-The uber.jar feature is not supported. [Oozie docs](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#AppDeployment)
-
-* [Support uber.jar feature](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/140)
-
-## Support for .so and .jar lib files
-
-Oozie adds .so and .jar files from the lib folder to Local Cache for all the jobs run to
-LD_LIBRARY_PATH/CLASSPATH. Currently only Java Mapper supports it.
-
-* [Support for Oozie lib .so files](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/302)
-* [Support for Oozie lib .jar files](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/301)
-
-## Custom messages missing for Kill Node
-
-The Kill Node might have custom log message specified. This is not implemented.
-[Oozie docs](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.1.3_Kill_Control_Node)
-
-* [Add handling of custom Kill Node message](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/97)
-
-## Capturing output is not supported
-
-In several actions you can capture output from tasks. This is not yet implemented.
-[Example Oozie docs](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.2.6_Java_Action)
-
-* [Add support for capture-ouput](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/155)
-
-## Subworkflow DAGs must be placed in examples
-
-Currently all subworkflow DAGs must be in examples folder
-
-* [Subworkflow conversion expects to be run in examples](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/213)
-
-## EL functions support
-
-Currently many EL-functions are implemented (basic functions, fs functions and subset od wf functions).
-Check this [document](https://docs.google.com/spreadsheets/d/1lQJ101GDEkXyzKmB8l9nESao6CF9G_1qCURdcqmQ0uA/edit?usp=sharing)
-for full information about current state. The following `wf:functions` are not implemented:
-
-* [`wf:actionTrackerUri`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/372)
-* [`wf:actionExternalId`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/371)
-* [`wf:actionData`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/370)
-* [`wf:run`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/369)
-* [`wf:errorMessage`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/368)
-* [`wf:errorCode`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/367)
-* [`wf:transition`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/366)
-* [`wf:callback`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/365)
-* [`wf:group`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/364)
-* [`wf:appPath`](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/363)
-* [Hadoop Counters](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/392)
-
-All implemented function could be found in [o2a_libs](https://github.com/GoogleCloudPlatform/oozie-to-airflow/tree/master/o2a/o2a_libs)
-module. Camel case names of Oozie functions were substituted with snake case equivalents (ex. lastErrorNode becomes
-last_error_node).
-
-Additionally some already implemented functions may not preserve the full logic of the original EL-expression
-due to differences between Oozie and Airflow. It's difficult to implement it in generic-enough way to cover
-all possible cases, it's much easier to eave the implementation of those functions to the user.
-It's perfectly possible to provide your own implementation of each of those functions if you need
-to customise it and in many cases it will be easier if it's specific implementation rather than generic one.
-
-## Notification proxy is not supported
-
-In Oozie, the `oozie.wf.workflow.notification.proxy` property can be used to configure proxy,
-through which notifications will be sent.
-
-This is not supported. Currently notifications will be sent directly, without proxy.
-
-# Cloud execution environment for Oozie to Airflow conversion
-
-## Cloud environment setup
-
-An easy way of running the workflows of Oozie as well as running the oozie-to-airflow converted DAGs in
-Airflow is by using Cloud Composer and Dataproc in GCP. This the environment supported currently by the
-converter and one that it was heavily tested with. These services allow testing without much need for an
-on-premise setup. Here are some details about the environment that is supported:
-
-### Cloud Composer
-
-* composer-2.2.0-airflow-2.5.1
-* python version 3 (3.8.10)
-* machine n1-standard-1
-* node count: 3
-* Additional PyPi packages:
-    * sshtunnel==0.1.4
-
-### Cloud Dataproc Cluster with Oozie
-
-* n1-standard-2, 4 vCPU, 20 GB memory (! Minimum 16 GB RAM needed)
-* primary disk size, 50 GB
-* Image 1.3.29-debian9
-* Hadoop version
-* Init action: [oozie-5.2.sh](dataproc/oozie-5.2.sh)
-
-Those are the steps you should follow to set it up:
-
-1. Create a Dataproc cluster see [Creating Dataproc Cluster](#creating-dataproc-cluster) below
-1. Create a [Cloud Composer Environment](https://cloud.google.com/composer/docs/how-to/managing/creating#creating_a_new_environment)
-   with at least Airflow version 2.0 to test the Apache Airflow workflows.
-1. Set up all required [Airflow Connections](https://airflow.apache.org/howto/connection/index.html)
-   in Composer. This is required for things like `SSHOperator`.
-
-### Creating Dataproc cluster
-
-We prepared Dataproc [initialization action](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/init-actions)
-that allows to run Oozie 5.2.0 on Dataproc.
-
-Please upload [oozie-5.2.sh](dataproc/oozie-5.2.sh) to your GCS bucket and create cluster using following command:
-
-Note that you need at least 20GB RAM to run Oozie jobs on the cluster. The custom machine type below has enough RAM
-to handle oozie.
-
-```bash
-gcloud dataproc clusters create <CLUSTER_NAME> --region europe-west1 --subnet default --zone "" \
-     --single-node --master-machine-type custom-4-20480 --master-boot-disk-size 500 \
-     --image-version 1.3-deb9 --project <PROJECT_NAME> --initialization-actions 'gs://<BUCKET>/<FOLDER>/oozie-5.1.sh' \
-     --initialization-action-timeout=30m
-```
-
-**Note 1:** it might take ~20 minutes to create the cluster
-**Note 2:** the init-action works only with
-  [single-node cluster](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/single-node-clusters)
-  and Dataproc 1.3
-
-Once cluster is created, steps from [example map reduce job](dataproc/example-map-reduce-job.sh) can be
-run on master node to execute Oozie's example Map-Reduce job.
-
-Oozie is serving web UI on port 11000. To enable access to it please follow
-[official instructions](https://cloud.google.com/dataproc/docs/concepts/accessing/cluster-web-interfaces)
-on how to connect to the cluster web interfaces.
-
-List of jobs with their statuses can be also shown by issuing `oozie jobs` command on master node.
-
-More about testing the Oozie to Airflow conversion process can be found in
-[CONTRIBUTING.md](CONTRIBUTING.md#running-system-tests)
-
-# Examples
-
-All examples can be found in the [examples](examples) directory.
-
-* [EL](#el-example)
-* [SSH](#ssh-example)
-* [Email](#email-example)
-* [MapReduce](#mapreduce-example)
-* [FS](#fs-example)
-* [Java](#java-example)
-* [Pig](#pig-example)
-* [Shell](#shell-example)
-* [Spark](#spark-example)
-* [Sub-workflow](#sub-workflow-example)
-* [DistCp](#distcp-example)
-* [Decision](#decision-example)
-* [Hive/Hive2](#hivehive2-example)
-* [Demo](#demo-example)
-* [Child workflow](#childwf-example)
-
-## EL Example
-
-### Running
-
-The Oozie Expression Language (EL) example can be run as:
-`o2a -i examples/el -o output/el`
-
-This will showcase the ability to use the [o2a/o2a_libs](o2a/o2a_libs) folder to map EL functions
-to Python methods. This example assumes that the user has a valid Apache Airflow
-SSH connection set up and the [o2a/o2a_libs](o2a/o2a_libs) folder has been copied to the dags
-folder (preserving o2a parent directory).
-
-Please keep in mind that as of the current version only a single EL variable
-or single EL function. Variable/function chaining is not currently supported.
-
-### Output
-In this example the output will be created in the `./output/el/` folder.
-
-### Known limitations
-
-Decision example is not yet fully functional as EL functions are not yet fully implemented so condition is
-hard-coded for now. Once EL functions are implemented, the condition in the example will be updated.
-
-Github issue: [Implement decision node](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/42)
-
-
-## SSH Example
-
-### Prerequisites
-
-In order to change the `user` or `host` in the example, please edit the
-`examples/ssh/hdfs/workflow.xml`.
-
-### Running
-
-The ssh example can be run as:
-
-`o2a -i examples/ssh -o output/ssh`
-
-This will convert the specified Oozie XML and write the output into the
-specified output directory, in this case `output/ssh/ssh.py`.
-
-There are some differences between Apache Oozie and Apache Airflow as far as the SSH specification goes.
-In Airflow you will have to add/edit an SSH-specific connection that contains
-the credentials required for the specified SSH action. For example, if
-the SSH node looks like:
-```xml
-<action name="ssh">
-    <ssh xmlns="uri:oozie:ssh-action:0.1">
-        <host>user@apache.org</host>
-        <command>echo</command>
-        <args>"Hello Oozie!"</args>
-    </ssh>
-    <ok to="end"/>
-    <error to="fail"/>
-</action>
-```
-Then the default Airflow SSH connection, `ssh_default` should have at
-the very least a password set. This can be found in the Airflow Web UI
-under **Admin > Connections**. From the command line it is impossible to
-edit connections so you must add one like:
-
-`airflow connections --add --conn_id <SSH_CONN_ID> --conn_type SSH --conn_password <PASSWORD>`
-
-More information can be found in [Airflow's documentation](https://airflow.apache.org/cli.html#connections).
-
-### Output
-In this example the output will be created in the `./output/ssh/` folder.
-
-The converted DAG uses the `SSHOperator` in Airflow.
-
-### Known limitations
-
-No known limitations.
-
-
-## Email Example
-
-### Prerequisites
-
-Make sure to first copy `/examples/email/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
-
-The Email example can be run as:
-
-`o2a -i examples/email -o output/email`
-
-### Output
-In this example the output will be created in the `./output/email/` folder.
-
-The converted DAG uses the `EmailOperator` in Airflow.
-
-### Prerequisites
-In Oozie the SMTP server configuration is located in `oozie-site.xml`.
-
-For Airflow it needs to be located in `airflow.cfg`.
-Example Airflow SMTP configuration:
-```
-[email]
-email_backend = airflow.utils.email.send_email_smtp
-
-[smtp]
-smtp_host = example.com
-smtp_starttls = True
-smtp_ssl = False
-smtp_user = airflow_user
-smtp_password = password
-smtp_port = 587
-smtp_mail_from = airflow_user@example.com
-```
-
-For more information on setting Airflow configuration options
-[see here](https://airflow.readthedocs.io/en/stable/howto/set-config.html).
-
-### Known limitations
-
-**1. Attachments are not supported**
-
-Due to the complexity of extracting files from HDFS inside Airflow and providing them
-for the `EmailOperator`, the functionality of sending attachments has not yet been
-implemented.
-
-*Solution:* Implement in O2A a mechanism to extract a file from HDFS inside Airflow.
-
-Github Issue: [Add support for attachment in Email mapper](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/335)
-
-**2. `<content_type>` tag is not supported**
-
-From Oozie docs:
-> From uri:oozie:email-action:0.2 one can also specify mail content type as
-<content_type>text/html</content_type>. “text/plain” is default.
-
-Unfortunately, currently the `EmailOperator` only accepts the `mime_subtype` parameter.
-However it only works for multipart subtypes, as the operator appends the subtype
-to the `multipart/` prefix. Therefore passing either `html` or `plain` from Oozie makes no sense.
-
-As a result the email will always be sent with the `EmailOperator`'s default Content-Type value,
-which is `multipart/mixed`.
-
-*Solution:* Modify the Airflow's `EmailOperator` to support more
-content types.
-
-Github Issue: [Content type support in Email mapper](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/343)
-
-**3. `cc` and `bcc` fields are not templated in EmailOperator**
-
-Only the 'to', 'subject' and 'html_content' fields in EmailOperator are templated.
-In practice this covers all fields of an Oozie email action node apart from `cc` and `bcc`.
-
-Therefore if there is an EL function in the action node in either of these two fields
-which will require a Jinja expression in Airflow, it will not work - the expression will
-not be executed, but rather treated as a plain string.
-
-*Solution:* Modify the Airflow's `EmailOperator` to mark more fields as
-`template_fields`.
-
-Github Issue: [The CC: and BCC: fields are not templated in EmailOperator](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/344)
-
-
-## MapReduce Example
-
-### Prerequisites
-
-Make sure to first copy `examples/mapreduce/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
-
-The MapReduce example can be run as:
-
-`o2a -i examples/mapreduce -o output/mapreduce`
-
-### Output
-In this example the output will be created in the `./output/mapreduce/` folder.
-
-The converted DAG uses the `DataProcHadoopOperator` in Airflow.
-
-### Known limitations
-
-**1. Exit status not available**
-
-From the [Oozie documentation](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.2.2_Map-Reduce_Action):
-> The counters of the Hadoop job and job exit status (FAILED, KILLED or SUCCEEDED) must be available to the
-workflow job after the Hadoop jobs ends. This information can be used from within decision nodes and other
-actions configurations.
-
-Currently we use the `DataProcHadoopOperator` which does not store the job exit status in an XCOM for other tasks to use.
-
-Issue in Github: [Implement exit status and counters in MapReduce Action](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/337)
-
-**2. Configuration options**
-
-From the [Oozie documentation](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.2.2_Map-Reduce_Action)
-(the strikethrough is from us):
-> Hadoop JobConf properties can be specified as part of
-> - ~~the config-default.xml or~~
-> - ~~JobConf XML file bundled with the workflow application or~~
-> - ~~\<global> tag in workflow definition or~~
-> - Inline map-reduce action configuration or
-> - ~~An implementation of OozieActionConfigurator specified by the <config-class> tag in workflow definition.~~
-
-Currently the only supported way of configuring the map-reduce action is with the
-inline action configuration, i.e. using the `<configuration>` tag in the workflow's XML file definition.
-
-Issues in Github:
-* [Add support for config-default.xml](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/137)
-* [Add support for parameters section of the workflow.xml](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/138)
-* [Handle global configuration properties](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/134)
-
-**3. Streaming and pipes**
-
-Streaming and pipes are currently not supported.
-
-Issue in github [Implement streaming support](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/336)
-
-## FS Example
-
-### Prerequisites
-
-Make sure to first copy `examples/fs/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
-
-The FS example can be run as:
-
-`o2a -i examples/fs -o output/fs`
-
-### Output
-In this example the output will be created in the `./output/fs/` folder.
-
-The converted DAG uses the `BashOperator` in Airflow.
-
-### Known limitations
-
-Not all FS operations are currently idempotent. It's not a problem if prepare action is used in other tasks
-but might be a problem in certain situations. Fixing the operators to be idempotent requires more complex
-logic and support for Pig actions is missing currently.
-
-Issue in Github: [FS Mapper and idempotence](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/175)
-
-The dirFiles are not supported in FSMapper.
-
-Issue in Github: [Add support for dirFiles in FsMapper](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/80)
-
-## Java Example
-
-### Prerequisites
-
-Make sure to first copy `examples/fs/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
-
-The Java example can be run as:
-
-`o2a -i examples/java -o output/java`
-
-### Output
-In this example the output will be created in the `./output/java/` folder.
-
-The converted DAG uses the `DataProcHadoopOperator` in Airflow.
-
-### Known limitations
-
-1. Overriding action's Main class via `oozie.launcher.action.main.class` is not implemented.
-
-Issue in Github: [Override Java main class with property](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/338)
-
-## Pig Example
-
-### Prerequisites
-
-Make sure to first copy `examples/pig/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
-
-The Pig example can be run as:
-
-`o2a -i examples/pig -o output/pig`
-
-### Output
-In this example the output will be created in the `./output/pig/` folder.
-
-The converted DAG uses the `DataProcPigOperator` in Airflow.
-
-### Known limitations
-**1. Configuration options**
-
-From the [Oozie documentation](https://oozie.apache.org/docs/5.2.0/WorkflowFunctionalSpec.html#a3.2.3_Pig_Action)
-(the strikethrough is from us):
-> Hadoop JobConf properties can be specified as part of
-> - ~~the config-default.xml or~~
-> - ~~JobConf XML file bundled with the workflow application or~~
-> - ~~\<global> tag in workflow definition or~~
-> - Inline pig action configuration.
-
-Currently the only supported way of configuring the pig action is with the
-inline action configuration, i.e. using the `<configuration>` tag in the workflow's XML file definition.
-
-Issues in Github:
-* [Add support for config-default.xml](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/137)
-* [Add support for parameters section of the workflow.xml](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/138)
-* [Handle global configuration properties](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/134)
-
-
-## Shell Example
-
-### Prerequisites
-
-Make sure to first copy `examples/shell/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
+<a name="_page2_x31.50_y1031.25"></a><a name="_page2_x31.50_y942.75"></a><a name="_page2_x31.50_y903.75"></a>Running ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.013.png)
 
 The Shell example can be run as:
 
-`o2a -i examples/shell -o output/shell`
+o2a  - i  exampl es / s hel l  - o  out put / s hel l![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.014.png)
 
-### Output
-In this example the output will be created in the `./output/shell/` folder.
+Alot of shell action jobs actually call bash scripts for spark/hive job execution , this bash script is often present in the ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.015.png)hadoop file system and is executed in a yarn container . This is a core difference between oozie and airflow that an oozie workflow is executed in a yarn container in a specific job queue configured. While in airflow , the DAG is executed on the airflow worker itself, so it has no direct access to the HDFS file system itself, which leads us to copy the files over to our local working dir and execute them  O2A documentation and limitations | HDFS script execution (RESOLVED) .
 
-The converted DAG uses the `BashOperator` in Airflow, which executes the desired shell
-action with Pig by invoking `gcloud dataproc jobs submit pig --cluster=<cluster> --region=<region>
---execute 'sh <action> <args>'`.
+Output ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.016.png)
 
-### Known limitations
+In this example the output will be created in the  . / out put / s hel l / folder.![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.017.png)
 
-**1. Exit status not available**
+<a name="_page3_x31.50_y194.25"></a>The converted DAG uses the  Bas hOper at or in Airflow, which executes the desired shell action on the airflow worker.![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.018.png)
 
-From the [Oozie documentation](https://oozie.apache.org/docs/5.2.0/DG_ShellActionExtension.html):
-> The output (STDOUT) of the Shell job can be made available to the workflow job after the Shell job ends.
-This information could be used from within decision nodes.
+Hive/Hive2 Example ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.019.png)
 
-Currently we use the `BashOperator` which can store only the last line of the job output in an XCOM.
-In this case the line is not helpful as it relates to the Dataproc job submission status and
-not the Shell action's result.
+Prerequisites ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.020.png)
 
-Issue in Github: [Finalize shell mapper](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/50)
+Make sure to first copy  / exampl es / hi ve/ conf i gur at i on. t empl at e. pr oper t i es , rename it as  conf i gur at i on. pr oper t i es and fill in ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.021.png)![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.022.png)with configuration data.
 
-**2. No Shell launcher configuration**
+<a name="_page3_x31.50_y327.75"></a>Running ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.023.png)
 
-From the [Oozie documentation](https://oozie.apache.org/docs/5.2.0/DG_ShellActionExtension.html):
-> Shell launcher configuration can be specified with a file, using the job-xml element, and inline,
-using the configuration elements.
+<a name="_page3_x31.50_y366.75"></a>The Hive example can be run as:
 
-Currently there is no way specify the shell launcher configuration (it is ignored).
+o2a  - i  exampl es / hi ve  - o  out put / hi ve![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.024.png)
 
-Issue in Github: [Shell Launcher Configuration](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/340)
+Output ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.025.png)
 
-## Spark Example
+In this example the output will be created in the  . / out put / hi ve/ folder.![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.026.png)
 
-### Prerequisites
+The converted DAG uses the  Hi veOper at or in Airflow & a default hive connection id = hive\_connection, you can see how to ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.027.png)configure this as shown in Known limitations.
 
-Make sure to first copy `/examples/spark/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
+<a name="_page3_x31.50_y455.25"></a>Known limitations ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.028.png)
 
-### Running
+There are few limitations in the implementation of the Oozie-To-Airflow converter. It's not possible to write a converter that handles all cases of complex workflows from Oozie because some of functionalities available are not possible to map easily to <a name="_page3_x31.50_y552.75"></a>existing Airflow Operators 
 
-The Spark example can be run as:
+Many of those limitations are not blockers - the workflows will still be converted to Python DAGs and it should be possible to manually (or automatically) post-process the DAGs to add custom functionality. So even with those limitations in place you can still save a ton of work when converting many Oozie workflows.
 
-`o2a -i examples/spark -o output/spark`
+![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.029.png) Exit status not available (shell actions) From the Oozie documentation:
 
-### Output
-In this example the output will be created in the `./output/spark/` folder.
+The output (STDOUT) of the Shell job can be made available to the workflow job after the Shell job ends. This information ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.030.png)<a name="_page3_x31.50_y706.50"></a>could be used from within decision nodes.
 
-The converted DAG uses the `DataProcSparkOperator` in Airflow.
+Currently we use the  Bas hOper at or which can store only the last line of the job output in an XCOM. In this case the line is not ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.031.png)helpful as it relates to the Dataproc job submission status and not the Shell action's result.
 
-### Known limitations
+Issue in Github: Finalize shell mapper
 
-**1. Only tasks written in Java are supported**
+![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.032.png) Not all global configuration methods are supported
 
-From the [Oozie documentation](https://oozie.apache.org/docs/5.2.0/DG_ShellActionExtension.html):
-> The jar element indicates a comma separated list of jars or python files.
+Oozie implements a number of ways how configuration parameters are passed to actions. Out of the existing configuration options the following ones are not supported (but can be easily added as needed):
 
-The solution was tested with only a single Jar file.
+1. The config-default.xml file
+1. Parameters section of workflow.xml
+1. Handle Global configuration properties
+- No Shell launcher configuration (shell actions)
 
-**2. No Spark launcher configuration**
+From the Oozie documentation:
 
-From the [Oozie documentation](https://oozie.apache.org/docs/5.2.0/DG_SparkActionExtension.html):
-> Shell launcher configuration can be specified with a file, using the job-xml element, and inline,
-using the configuration elements.
+Shell launcher configuration can be specified with a file, using the job-xml element, and inline, using the configuration ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.033.png)elements.
 
-Currently there is no way to specify the Spark launcher configuration (it is ignored).
+Currently there is no way specify the shell launcher configuration (it is ignored). Issue in Github: Shell Launcher Configuration
 
-**3. Not all elements are supported**
+![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.034.png) Custom messages missing for Kill Node
 
-The following elements are not supported: `job-tracker`, `name-node`, `master`, `mode`.
+The Kill Node might have custom log message specified. This is not implemented, but will be taken up in future enhancements Oozie docs
 
-## Sub-workflow Example
+ODP-4307: Add support for custom kill node messages in O2A TO DO![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.035.png)
 
-### Prerequisites
-
-Make sure to first copy `examples/subwf/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
-
-The Sub-workflow example can be run as:
-
-`o2a -i examples/subwf -o output/subwf`
-
-### Output
-In this example the output (together with sub-worfklow dag) will be created in the `./output/subwf/` folder.
-
-The converted DAG uses the `SubDagOperator` in Airflow.
-
-### Known limitations
-
-No known limitations.
-
-## DistCp Example
-
-### Prerequisites
-
-Make sure to first copy `examples/distcp/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
-
-The DistCp example can be run as:
-
-`o2a -i examples/distcp -o output/distcp`
-
-### Output
-In this example the output will be created in the `./output/distcp/` folder.
-
-The converted DAG uses the `BashOperator` in Airflow, which submits the Hadoop DistCp job using the
-`gcloud dataproc jobs submit hadoop` command.
-
-### Known limitations
-
-The system test of the example run with Oozie fails due to unknown reasons. The converted DAG run by Airflow
-completes successfully.
-
-## Decision Example
-
-### Prerequisites
-
-Make sure to first copy `examples/decision/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
-
-The decision example can be run as:
-
-`o2a -i examples/decision -o output/decision`
-
-### Output
-In this example the output will be created in the `./output/decision/` folder.
-
-The converted DAG uses the `BranchPythonOperator` in Airflow.
-
-### Known limitations
-
-Decision example is not yet fully functional as EL functions are not yet fully implemented so condition is
-hard-coded for now. Once EL functions are implemented, the condition in the example will be updated.
-
-Github issue: [Implement decision node](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/42)
-
-
-## Hive/Hive2 Example
-
-### Prerequisites
-
-Make sure to first copy `/examples/hive/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
-
-### Running
-
-The Hive example can be run as:
-
-`o2a -i examples/hive -o output/hive`
-
-### Output
-In this example the output will be created in the `./output/hive/` folder.
-
-The converted DAG uses the `DataProcHiveOperator` in Airflow.
-
-### Known limitations
-
-**1. Only the connection to the local Hive instance is supported.**
+- Capturing output is not supported In several actions you can capture output from tasks. This is not yet implemented. Example Oozie docs
+- Only the connection to the local Hive instance is supported.
 
 Connection configuration options are not supported.
 
+- Not all elements are supported
 
-**2. Not all elements are supported**
+For Hive, the following elements are not supported:  j ob- t r acker ,  name- node . For Hive2, the following elements are not ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.036.png)![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.037.png)supported:  j ob- t r acker ,  name- node ,  j dbc- ur l ,  pas s wor d .![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.038.png)![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.039.png)![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.040.png)
 
-For Hive, the following elements are not supported: `job-tracker`, `name-node`.
-For Hive2, the following elements are not supported: `job-tracker`, `name-node`, `jdbc-url`, `password`.
+The Github issue for both problems: Hive connection configuration and other elements, 
 
-The Github issue for both problems: [Hive connection configuration and other elements](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/342)
+Instead, we need to create a custom Hive connection in Airflow as shown below
 
+![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.041.jpeg)
 
-## Demo Example
+You might need to update your hive script variables: So variables such as ${INPUT} passed through hiveconf might not ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.042.png)always resolve correctly, unless we add a hiveconf: prefix to them, especially in a Tez execution. 
 
-The demo example contains several action and control nodes. The control
-nodes are `fork`, `join`, `decision`, `start`, `end`, and `kill`. As far as action
-nodes go, there are `fs`, `map-reduce`, and `pig`.
+For e.g. :- 
 
-Most of these are already supported, but when the program encounters a node it does
-not know how to parse, it will perform a sort of "skeleton transformation" -
-it will convert all the unknown nodes to dummy nodes. This will
-allow users to manually parse the nodes if they so wish as the control flow
-is there.
+1  CREATE  EXTERNAL  TABLE  t es t  ( a  I NT)  STORED  AS  TEXTFI LE  LOCATI ON  ' ${I NPUT}' ;
+1  I NSERT  OVERWRI TE  DI RECTORY  ' ${OUTPUT}'  SELECT  \*  FROM  t es t ;
 
-### Prerequisites
+3
 
-Make sure to first copy `examples/demo/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
+4 Thes e  var i abl es  wi l l  get  conver t ed  t o 5
 
-### Running
+6  CREATE  EXTERNAL  TABLE  t es t  ( a  I NT)  STORED  AS  TEXTFI LE  LOCATI ON  ' ${hi veconf : I NPUT}' ;
+6  I NSERT  OVERWRI TE  DI RECTORY  ' ${hi veconf : OUTPUT}'  SELECT  \*  FROM  t es t ;
 
-The demo can be run as:
+Errors you might face
 
-`o2a -i examples/demo -o output/demo`
+HDFS Filepath exception
 
-This will parse and write to an output file in the `output/demo` directory.
+1  [ 2025- 04- 09T12: 06: 32. 672+0530]  {oozi e\_conver t er . py: 125}  I NFO  -  Conver t i ng  nodes  t o  t as ks  and  i nner  r el at i ons
+1  Tr aceback  ( mos t  r ecent  cal l  l as t ) :
+1  Fi l e  "/ r oot / f i nal e/ o2a/ . / bi n/ o2a",  l i ne  38,  i n  <modul e>
 
-### Known limitations
+4 o2a. o2a. mai n( )
 
-The decision node is not fully functional as there is not currently
- support for all EL functions. So in order for it to run in Airflow you may need to
-edit the Python output file and change the decision node expression.
+5 Fi l e  "/ r oot / f i nal e/ o2a/ o2a/ o2a. py",  l i ne  137,  i n  mai n 6 conver t er . conver t ( )
 
-Issue in GitHub: [Implement decision node](https://github.com/GoogleCloudPlatform/oozie-to-airflow/issues/42)
+7 Fi l e  "/ r oot / f i nal e/ o2a/ o2a/ conver t er / oozi e\_conver t er . py",  l i ne  106,  i n  conver t 8 s el f . conver t \_nodes ( ) 9 Fi l e  "/ r oot / f i nal e/ o2a/ o2a/ conver t er / oozi e\_conver t er . py",  l i ne  127,  i n  conver t \_nodes
 
-### Output
-In this example the output (including sub-workflow dag) will be created in the `./output/demo/` folder.
+10 t as ks ,  r el at i ons  =  oozi e\_node. mapper . t o\_t as ks \_and\_r el at i ons ( )
 
-## Childwf Example
+11 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-### Prerequisites
+<a name="_page5_x31.50_y668.25"></a>12 Fi l e  "/ r oot / f i nal e/ o2a/ o2a/ mapper s / s hel l \_mapper . py",  l i ne  119,  i n  t o\_t as ks \_and\_r el at i ons 13 pr epar e\_t as k  =  s el f . pr epar e\_ext ens i on. get \_pr epar e\_t as k( )
 
-Make sure to first copy `examples/subwf/configuration.template.properties`, rename it as
-`configuration.properties` and fill in with configuration data.
+14 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-### Running
+<a name="_page5_x31.50_y706.50"></a>15 Fi l e  "/ r oot / f i nal e/ o2a/ o2a/ mapper s / ext ens i ons / pr epar e\_mapper \_ext ens i on. py",  l i ne  40,  i n  get \_pr epar e\_t as k 16 del et e\_pat hs ,  mkdi r \_pat hs  =  s el f . par s e\_pr epar e\_node( ) 17 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The childwf example is sub-workflow for the `demo` example. It can be run as:
+18 Fi l e  "/ r oot / f i nal e/ o2a/ o2a/ mapper s / ext ens i ons / pr epar e\_mapper \_ext ens i on. py",  l i ne  67,  i n  par s e\_pr epar e\_node ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.043.png)19 node\_pat h  =  nor mal i ze\_pat h( node. at t r i b[ "pat h"] ,  pr ops =s el f . mapper . pr ops ) 20 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 21 Fi l e  "/ r oot / f i nal e/ o2a/ o2a/ ut i l s / el \_ut i l s . py",  l i ne  147,  i n  nor mal i ze\_pat h 22 r ai s e  Par s eExcept i on( 23 o2a. conver t er . except i ons . Par s eExcept i on:  Unknown  pat h  f or mat .  The  URL  s houl d  be  pr ovi ded  i n  t he  f ol l owi ng
 
-`o2a -i examples/childwf -o output/childwf`
+f or mat :  hdf s : / / l ocal hos t : 9200/ pat h.  Cur r ent  val ue:  {{  par ams . get ( ' USCCETLI nges t Di r ' )  }}/ {{
 
-### Output
-In this example the output will be created in the `./output/childwf/` folder.
+par ams . get ( ' USCCETLI nges t DoneI ndFi l e' )  }}  None  0  {{  par ams . get ( ' USCCETLI nges t Di r ' )  }}/ {{
 
-### Known limitations
+par ams . get ( ' USCCETLI nges t DoneI ndFi l e' )  }}
 
-No known limitations.
+Add the variables that resolve to an hdfs location "${tmpLocation}" to resolve\_name\_node method in  o2a/ ut i l s / el \_ut i l s . py
+
+1  106  def  \_r es ol ve\_name\_node( t r ans l at i on:  s t r ,  pr ops :  Pr oper t ySet )  - >  Tupl e[ Opt i onal [ s t r ] ,  i nt ] :
+1  107      """
+1  108      Check  i f  pr ops  i ncl ude  nameNode,  nameNode1  or  nameNode2  val ue.
+1  109      """
+1  110      mer ged  =  pr ops . mer ged
+1  111      f or  key  i n  [ "nameNode",  "nameNode1",  "nameNode2",  "dat aNode",  "t mpLocat i on""] :
+1  112      #Add  t he  var i abl es  t hat  r es ol ve  t o  an  hdf s  l ocat i on  "${t mpLocat i on}"
+1  113          s t ar t \_s t r  =  "{{"  +  '  par ams . get ( \ \ ' '  +  key  +  ' \ \ ' )  '  +  "}}"
+1  114          s t ar t \_s t r \_dat a\_node  =  "${"  +  '  par ams . get ( \ \ ' '  +  "dat aNode"  +  ' \ \ ' )  '  +  "}"
+1  115          name\_node  =  mer ged. get ( key)
+1  116          i f  t r ans l at i on. s t ar t s wi t h( s t ar t \_s t r )  and  name\_node:
+1  117              r et ur n  name\_node,  l en( s t ar t \_s t r )
+1  118          i f  t r ans l at i on. s t ar t s wi t h( s t ar t \_s t r \_dat a\_node)  and  name\_node:
+1  119              r et ur n  name\_node,  l en( s t ar t \_s t r \_dat a\_node)
+1  120      r et ur n  None,  0
+
+HDFS File Paths in hiveconfs
+
+Using HDFS File Paths in HiveOperator  hi veconf s
+
+When using the  Hi veOper at or in Apache Airflow, it's important to correctly format the HDFS file paths passed as Hive configuration variables ( hi veconf s ). Incorrect path references can lead to runtime errors during Hive query execution.
+
+🚫 Problem:
+
+Users often pass HDFS paths dynamically via variables like  J OB\_PROPS[ ' us er . name' ] or  J OB\_PROPS[ ' exampl es Root ' ] , which may not resolve correctly at runtime, especially if the paths assume a different user context.
+
+<a name="_page6_x31.50_y535.50"></a>For example:
+
+1 hi veconf s ={
+
+2 "I NPUT":  f "/ us er / {J OB\_PROPS[ ' us er . name' ] }/ exampl es / i nput - dat a/ t abl e",
+
+3 "OUTPUT":  f "/ us er / {J OB\_PROPS[ ' us er . name' ] }/ {J OB\_PROPS[ ' exampl es Root ' ] }/ out put - dat a/ hi ve2", 4 }
+
+If  J OB\_PROPS[ ' us er . name' ] resolves to something other than  ai r f l ow, the query may fail with errors like:
+
+1 I nput  pat h  does  not  exi s t :  hdf s : / / . . . / us er / ai r f l ow/ us er / oozi e/ exampl es / i nput - dat a/ t abl e
+
+✅ Recommended Fix:
+
+Explicitly construct your HDFS paths to align with the runtime context of the  ai r f l ow user, since Airflow's Hive tasks often execute as that user.
+
+Use paths like:
+
+1 hi veconf s ={
+
+2 "I NPUT":  "/ us er / ai r f l ow/ exampl es / i nput - dat a/ t abl e",![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.044.png)
+
+3 "OUTPUT":  "/ us er / ai r f l ow/ exampl es / out put - dat a/ hi ve2", 4 }
+
+Ensure that the input/output directories exist in HDFS under the correct user path ( / us er / ai r f l ow/ . . . ). Hive DAG:  Cannot  modi f y  \*\*\*. ct x. t r y\_number  at  r unt i me
+
+![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.045.jpeg)
+
+<a name="_page7_x31.50_y144.00"></a>By default,  Hi veOper at or includes all context variables in the  hi veconf . To enable airflow to pass these variables, you can update the config shown below in your hive-site.xml 
+
+1 hi ve. s ecur i t y. aut hor i zat i on. s ql s t d. conf whi t el i s t . append  =  ai r f l ow. ct x. \*| mapr ed. j ob. name| I NPUT| OUTPUT
+
+Skeleton Transformation
+
+The O2A conversion supports several action and control nodes. The control nodes include fork, join, start, end, and kill. Among the action nodes, fs, map-reduce, and pig are supported.
+
+Most of these are already handled, but when the program encounters a node it does not know how to parse, it performs a kind of "skeleton transformation" — converting all unknown nodes into dummy nodes. This allows users to manually parse those nodes later if they wish, as the control flow remains intact.
+
+<a name="_page7_x31.50_y449.25"></a>Decision Node
+
+The decision node is not fully functional as there is not currently support for all EL functions. So in order for it to run in Airflow you may need to edit the Python output file and change the decision node expression.
+
+Issue in GitHub: Implement decision node
+
+Features that are not supported
+
+Oozie workflow EL Functions
+
+Workflow functions are not supported. Instead of EL functions, the user will have to use Airflow xcoms feature for passing <a name="_page7_x31.50_y608.25"></a>variables between different actions in a workflow.
+
+this will be taken up as a future enhancement and more workflow functions will be added to O2A. ( ODP-4308: Add support for
+
+oozie wf functions in O2A TO DO )
+
+For eg, For this workflow
+
+1 <wor kf l ow- app  name="Wor kFl owFor Shel l Act i onWi t hCapt ur eOut put "  xml ns ="ur i : oozi e: wor kf l ow: 1. 0"> 2 <s t ar t  t o="s hel l Act i on"/ > 3 <act i on  name="s hel l Act i on">
+
+4 <s hel l  xml ns ="ur i : oozi e: s hel l - act i on: 1. 0">
+
+<a name="_page7_x31.50_y762.00"></a><a name="_page7_x31.50_y801.00"></a>5 <j ob- t r acker >${j obTr acker }</ j ob- t r acker >
+
+6 <name- node>${nameNode}</ name- node>![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.046.png)
+
+7 <conf i gur at i on>
+
+8 <pr oper t y>
+
+9 <name>mapr ed. j ob. queue. name</ name>
+
+10 <val ue>${queueName}</ val ue>
+
+11 </ pr oper t y>
+
+12 </ conf i gur at i on>
+
+13 <exec>${l i neCount Shel l Scr i pt }</ exec>
+
+14 <ar gument >${i nput Di r }</ ar gument >
+
+15 <f i l e>${l i neCount ShScr i pt Pat h}#${l i neCount Shel l Scr i pt }</ f i l e>
+
+16 <capt ur e- out put / >
+
+17 </ s hel l >
+
+18 <ok  t o="s endEmai l "/ >
+
+19 <er r or  t o="ki l l Act i on"/ >
+
+20 </ act i on>
+
+21 <act i on  name="s endEmai l ">
+
+22 <emai l  xml ns ="ur i : oozi e: emai l - act i on: 0. 2">
+
+23 <t o>${emai l ToAddr es s }</ t o>
+
+24 <s ubj ect >Out put  of  wor kf l ow  ${wf : i d( ) }</ s ubj ect >
+
+25 <body>Res ul t s  f r om  l i ne  count :  ${wf : act i onDat a( ' s hel l Act i on' ) [ ' Number Of Li nes ' ] }</ body> 26 </ emai l >
+
+27 <ok  t o="end"/ >
+
+28 <er r or  t o="end"/ >
+
+29 </ act i on>
+
+30 <ki l l  name="ki l l Act i on">
+
+31 <mes s age>"Ki l l ed  j ob  due  t o  er r or "</ mes s age>
+
+32 </ ki l l >
+
+33 <end  name="end"/ > 34 </ wor kf l ow- app>
+
+We get the below DAG 
+
+1  #  Def i ne  a  f unct i on  t o  l og  t he  s hel l  act i on  dat a
+1  def  l og\_s hel l \_act i on\_dat a( \*\*cont ext ) :
+
+3 t i  =  cont ext [ ' t i ' ]
+
+4 s hel l \_out put  =  t i . xcom\_pul l ( t as k\_i ds =' s hel l Act i on' )
+
+5 l ogger . i nf o( "Out put  of  s hel l Act i on:  %s ",  s hel l \_out put )
+
+6 #  Pr oces s  t he  s hel l \_out put  as  needed
+
+7 r et ur n  "Loggi ng  compl et ed"
+
+8
+
+9 wi t h  model s . DAG(
+
+10 "s ampl e\_s hel l \_oozi e\_2",
+
+11 s chedul e\_i nt er val =None,
+
+12 s t ar t \_dat e=dat es . days \_ago( 0) ,
+
+13 us er \_def i ned\_macr os =TEMPLATE\_ENV, 14 )  as  dag: 15 s hel l Act i on  =  bas h. Bas hOper at or (
+
+16 t as k\_i d="s hel l Act i on",
+
+17 t r i gger \_r ul e="one\_s ucces s ",
+
+18 bas h\_command=( "hdf s  df s  - cat
+
+hdf s : / / t es t cl us t er . accel dat a. ce/ us er / oozi e/ wor kf l owShel l Act i on/ l i neCount . s h | bas h - s
+
+hdf s : / / t es t cl us t er . accel dat a. ce/ us er / oozi e/ t ext . t xt ") ,
+
+19 do\_xcom\_pus h=Tr ue,
+
+20 par ams =Pr oper t ySet (
+
+21 conf i g=CONFI G,
+
+22 j ob\_pr oper t i es =J OB\_PROPS,
+
+23 act i on\_node\_pr oper t i es ={"mapr ed. j ob. queue. name":  "def aul t "},
+
+24 ) . mer ged,
+
+25 )
+
+26![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.047.png)
+
+27 #  Log  t he  act i on  dat a
+
+28 l og\_act i on\_dat a  =  Pyt honOper at or (
+
+29 t as k\_i d="l og\_act i on\_dat a",
+
+30 pyt hon\_cal l abl e=l og\_s hel l \_act i on\_dat a,
+
+31 pr ovi de\_cont ext =Tr ue,
+
+32 dag=dag,
+
+33 )
+
+34
+
+35 s endEmai l  =  emai l . Emai l Oper at or (
+
+36 t as k\_i d="s endEmai l ",
+
+37 t r i gger \_r ul e="one\_s ucces s ",
+
+38 t o="{{emai l ToAddr es s }}",
+
+39 cc=None,
+
+40 bcc=None,
+
+41 s ubj ect ="Out put  of  wor kf l ow  {{r un\_i d}}", 
+
+42 ht ml \_cont ent ="Res ul t s  f r om  l i ne  count :  t i . xcom\_pul l ( t as k\_i ds =' s hel l Act i on' ) ", 43 par ams =Pr oper t ySet ( conf i g=CONFI G,  j ob\_pr oper t i es =J OB\_PROPS) . mer ged,
+
+44 )
+
+45
+
+46 #  Set  t he  t as k  dependenci es
+
+47 s hel l Act i on  >>  l og\_act i on\_dat a  >>  s endEmai l    
+
+Coordinator job conversion
+
+The current scope of the Oozie to Airflow migration tool focuses primarily on workflow conversion. Support for Oozie coordinator job parsing and conversion is not included at this stage. However, this functionality is being considered for a future enhancement.
+
+ODP-4311: Add coordinator job conversion support in O2A TO DO Job-xml (RESOLVED)
+
+<a name="_page9_x31.50_y419.25"></a>Your Job-xml nodes will be loaded into the airflow worker and all itʼs current variables will be loaded in the airflow session as shown below
+
+1 Si mpl eShel l Act i on  =  bas h. Bas hOper at or (
+
+2 t as k\_i d="Si mpl eShel l Act i on",
+
+3 t r i gger \_r ul e="one\_s ucces s ",
+
+4 bas h\_command="""
+
+5 #  Execut e  t he  s hel l  command
+
+6 s h  echo{{  par ams . get ( ' pol i cymgr \_ur l ' )  }}
+
+7 """,
+
+8 par ams =Pr oper t ySet (
+
+9 conf i g=CONFI G,
+
+10 j ob\_pr oper t i es =J OB\_PROPS,
+
+11 act i on\_node\_pr oper t i es =f unct i ons . ext r act \_pr oper t i es \_f r om\_j ob\_xml \_nodes ( 12 "hdf s : / / ai r f l owdemonode01. accel dat a. ce/ t mp/ hi ve- s i t e2. xml "
+
+13 ) ,
+
+14 ) . mer ged,
+
+15 )
+
+While this action node migration is now resolved, we still need to make sure that job-xml node does not contain any ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.048.png)variable references to our job.properties variables, as job.properties is mapped out to JOB\_PROPS in our converted DAG and is not accessible in params section.
+
+i.e. the job-xml location should not be a variable.
+
+Config resolution (RESOLVED)
+
+In our Oozie workflow properties, we sometimes add configs that are dependent on other configs for their value. This variable resolution does not happen in airflow configs .
+
+1 cat  j ob. pr oper t i es ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.049.png)2
+
+3  dat aSour ce=et l
+3  dat aNode=hdf s : / / t es t cl us t er . accel dat a. ce
+3  ####Domai n/ Admi n  Di r ect or i es ####
+3  USETLDat aRoot Di r =${dat aNode}/ pr oj ect s / l s r / et l / dat a/ ${dat aSour ce}
+3  USETLI nges t Di r =hdf s : / / ${USETLDat aRoot Di r }/ i nges t
+
+Instead, the variables referenced return the first variable value that they get , i.e. 
+
+${dat aNode}/ pr oj ect s / l s r / et l / dat a/ ${dat aSour ce} for  USETLDat aRoot Di r , instead of ![](Aspose.Words.36c4333d-1e49-4c20-a116-9e11ef1f2da9.050.png)
+
+hdf s : / / t es t cl us t er . accel dat a. ce/ pr oj ect s / l s r / et l / dat a/ et l , which is what the value should be.
